@@ -14,8 +14,8 @@ vec3 scene(vec2 uv) {
   float edge = smoothstep(0.0, 0.18, min(within, 1.0 - within));
   float mag = specAt(pow((slot + 0.5) / SLOTS, 0.8));
 
-  float inner = 0.44 + 0.05 * uNorm[SUB];
-  float outer = inner + mag * (0.46 + 0.20 * uNorm[BASS]);
+  float inner = 0.52 + 0.06 * uNorm[SUB];
+  float outer = inner + mag * (0.54 + 0.24 * uNorm[BASS]);
 
   float bar = step(inner, r) * step(r, outer) * edge;
   float cap = smoothstep(0.014, 0.0, abs(r - outer)) * edge;

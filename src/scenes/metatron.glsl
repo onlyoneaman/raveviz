@@ -3,7 +3,7 @@
 // getting brighter.
 vec3 scene(vec2 uv) {
   float snap = floor(uBeat) * PI * 0.5 * step(0.5, uConf);
-  vec2 p = uv * (1.55 - 0.22 * uNorm[SUB]);
+  vec2 p = uv * (1.24 - 0.18 * uNorm[SUB]);
   p *= rot2(uTime * 0.05 + snap * 0.06 + uPhase * 0.02);
 
   vec3 col = vec3(0.0);

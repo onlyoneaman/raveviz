@@ -41,6 +41,12 @@ export type Scene = {
   bloom?: number
   /** Whether the borrowed third palette stop applies. Off keeps a scene monochrome. */
   accent?: boolean
+  /**
+   * Strength of the shared ambient backdrop. Scenes that are one centred object
+   * need it or a wide screen is mostly empty; scenes that already fill the
+   * frame leave it at 0.
+   */
+  fill?: number
 }
 
 const hex = (v: string): Rgb => [
@@ -67,6 +73,7 @@ export const scenes: Scene[] = [
     resScale: 1.0,
     feedback: { decay: 0.55, scale: 1.0, rotate: 0.0 },
     camera: false,
+    fill: 0.9,
   },
   {
     name: 'vortex',
@@ -88,6 +95,7 @@ export const scenes: Scene[] = [
     palette: [hex('#B026FF'), hex('#39FF14')],
     resScale: 1.0,
     feedback: { decay: 0.74, scale: 0.997, rotate: 0.004 },
+    fill: 1.0,
   },
   {
     name: 'metatron',
@@ -95,6 +103,7 @@ export const scenes: Scene[] = [
     palette: [hex('#FF6A00'), hex('#FFD84D')],
     resScale: 1.0,
     feedback: { decay: 0.72, scale: 1.0, rotate: 0.0 },
+    fill: 1.0,
   },
   {
     name: 'kali',
@@ -109,6 +118,7 @@ export const scenes: Scene[] = [
     palette: [hex('#4A00E0'), hex('#C6FF00')],
     resScale: 0.7,
     feedback: { decay: 0.78, scale: 1.002, rotate: 0.001 },
+    fill: 0.8,
   },
   {
     name: 'girder',
@@ -155,6 +165,7 @@ export const scenes: Scene[] = [
     palette: [hex('#FFD166'), hex('#06D6F0')],
     resScale: 1.0,
     feedback: { decay: 0.62, scale: 1.0, rotate: 0.0 },
+    fill: 0.7,
   },
   {
     name: 'prism',
@@ -172,6 +183,7 @@ export const scenes: Scene[] = [
     camera: false,
     bloom: 0.5,
     accent: false,
+    fill: 0.85,
   },
   {
     name: 'liquid',
@@ -195,6 +207,7 @@ export const scenes: Scene[] = [
     palette: [hex('#FF4FD8'), hex('#35E8FF')],
     resScale: 1.0,
     feedback: { decay: 0.72, scale: 0.99, rotate: 0.003 },
+    fill: 0.5,
   },
   {
     name: 'yantra',
@@ -202,6 +215,7 @@ export const scenes: Scene[] = [
     palette: [hex('#FFB000'), hex('#FF2D55')],
     resScale: 1.0,
     feedback: { decay: 0.66, scale: 0.998, rotate: 0.002 },
+    fill: 1.0,
   },
   {
     name: 'strobe',

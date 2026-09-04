@@ -2,7 +2,7 @@
 // ringed by lotus petals, with Om at the bindu. The Om is the real Devanagari
 // glyph rasterised to a texture, not an approximation built from arcs.
 vec3 scene(vec2 uv) {
-  vec2 p = uv * (1.42 - 0.16 * uNorm[SUB]);
+  vec2 p = uv * (1.12 - 0.14 * uNorm[SUB]);
   p *= rot2(uPhase * 0.04 + uTime * 0.015);
 
   vec3 col = vec3(0.0);

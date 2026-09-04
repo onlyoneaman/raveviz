@@ -25,7 +25,7 @@ const SCENE_MAIN = `
 void main() {
   vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;
   uv = rot2(uCamSpin) * uv * uCamZoom;
-  fragColor = vec4(scene(uv), 1.0);
+  fragColor = vec4(scene(uv) + ambient(uv) * uFill, 1.0);
 }`
 
 const frag = (body: string, sceneMain: boolean) =>

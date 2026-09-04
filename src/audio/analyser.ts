@@ -127,6 +127,28 @@ export function audibility(level: number) {
   return clamp01((level - audio.quietRms) / (audio.loudRms - audio.quietRms))
 }
 
+/**
+ * Rescales each FFT bin against its own recent peak. Without it a spectrum
+ * visual is all bass: the low end is orders of magnitude louder, so anything
+ * driven by the upper bins barely moves.
+ */
+export class SpectrumWhitener {
+  private readonly peak: Float32Array
+
+  constructor(size: number) {
+    this.peak = new Float32Array(size)
+  }
+
+  process(spectrum: Uint8Array, dt: number) {
+    const keep = Math.exp(-dt / audio.specPeakDecayS)
+    for (let i = 0; i < spectrum.length; i++) {
+      const v = spectrum[i]
+      const p = (this.peak[i] = Math.max(v, this.peak[i] * keep))
+      spectrum[i] = p > audio.specPeakFloor ? Math.min(255, (v / p) * 255) : 0
+    }
+  }
+}
+
 export function rms(mag: Float32Array) {
   let sum = 0
   for (let i = 1; i < mag.length; i++) sum += mag[i] * mag[i]

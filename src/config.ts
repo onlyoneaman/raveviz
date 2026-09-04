@@ -28,6 +28,10 @@ export const audio = {
   // Judging it on FFT magnitudes needs a different constant per band (the air
   // band spreads its energy over ~300 bins, the sub over ~2), so a single
   // threshold there silently gated the upper bands off at every volume.
+  // Per-bin whitening for the spectrum texture. Music has far more energy
+  // down low, so a raw spectrum leaves every treble-driven visual flat.
+  specPeakDecayS: 1.6,
+  specPeakFloor: 6,
   quietRms: 0.003,
   loudRms: 0.025,
 

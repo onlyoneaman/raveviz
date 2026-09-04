@@ -1,6 +1,7 @@
-import { BAND_COUNT, BASS, audio as cfg, visual } from '../config'
+import { BAND_COUNT, BASS, SPECTRUM_SIZE, audio as cfg, visual } from '../config'
 import {
   AdaptiveNorm,
+  SpectrumWhitener,
   audibility,
   coeff,
   BandSplitter,
@@ -34,6 +35,7 @@ export class AudioEngine {
   private readonly splitter: BandSplitter
   private readonly envelopes = new Envelopes()
   private readonly norm = new AdaptiveNorm()
+  private readonly whiten = new SpectrumWhitener(SPECTRUM_SIZE)
   private readonly onsets: OnsetDetector
   private readonly raw = new Float32Array(BAND_COUNT)
 
@@ -86,6 +88,7 @@ export class AudioEngine {
 
     this.onsetNode.getByteTimeDomainData(f.wave)
     this.bandNode.getByteFrequencyData(f.spectrum)
+    this.whiten.process(f.spectrum, dt)
     f.nyquist = this.ctx.sampleRate * 0.5
     this.bandNode.getFloatFrequencyData(this.bandDb)
     this.onsetNode.getFloatFrequencyData(this.onsetDb)

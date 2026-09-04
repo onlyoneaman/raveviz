@@ -27,6 +27,7 @@ uniform float uNyquist;
 uniform float uKickZoom;
 uniform float uKickFlash;
 uniform float uBloom;
+uniform float uFill;
 
 /** Time-domain sample at x in 0..1, returned in -1..1. */
 float waveAt(float x) { return texture(uWave, vec2(clamp(x, 0.0, 1.0), 0.5)).r * 2.0 - 1.0; }
@@ -71,6 +72,32 @@ vec3 pal(float t) {
     ? mix(uPalA, uPalB, smoothstep(0.0, 1.0, t * 2.0))
     : mix(uPalB, uPalC, smoothstep(0.0, 1.0, t * 2.0 - 1.0));
   return hueRotate(c, uHue);
+}
+
+/**
+ * Shared backdrop for scenes that are a single centred object. Three layers,
+ * all weak and all audio-driven: drifting haze, spectrum rings spreading
+ * outward, and a faint grid that only appears away from the centre. Without it
+ * a wide screen is mostly dead black around the subject.
+ */
+vec3 ambient(vec2 uv) {
+  float r = length(uv);
+  // Gated away from the middle, so it never competes with the subject.
+  float far = smoothstep(0.45, 1.7, r);
+
+  // Thresholded to wisps. Without the cut this reads as a wash, not texture.
+  float haze = fbm(uv * 1.6 + vec2(uTime * 0.03, -uTime * 0.02));
+  haze = pow(max(haze - 0.45, 0.0) * 2.2, 2.0);
+  vec3 col = pal(0.15 + haze * 0.5) * haze * (0.10 + 0.40 * uNorm[SUB]);
+
+  // Thin rings travelling outward, not a glow.
+  float w = specAt(fract(r * 0.38 - uPhase * 0.15));
+  col += pal(0.6) * pow(max(w - 0.55, 0.0) * 2.2, 2.0) * 0.32;
+
+  vec2 g = abs(fract(uv * 2.5) - 0.5);
+  col += pal(0.25) * smoothstep(0.46, 0.5, max(g.x, g.y)) * 0.07 * (0.4 + uNorm[LOMID]);
+
+  return col * far * (0.5 + 0.9 * uNorm[BASS]);
 }
 
 /** 1.0 on the beat, falling away. Higher `sharp` is a tighter spike. */

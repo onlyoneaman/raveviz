@@ -20,6 +20,7 @@ export function uploadAudio(
   u.f('uKickZoom', visual.kickZoom)
   u.f('uKickFlash', visual.kickFlash)
   u.f('uBloom', scene.bloom ?? 1)
+  u.f('uFill', scene.fill ?? 0)
   u.fv('uNorm', f.norm)
   u.fv('uImpulse', f.impulse)
   u.f('uRms', f.rms)

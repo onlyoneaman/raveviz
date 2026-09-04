@@ -13,7 +13,7 @@ vec3 scene(vec2 uv) {
     p = kale(p, petals);
 
     float band = specAt(0.08 + fi * 0.22);
-    float radius = 0.26 + fi * 0.22 + band * 0.10;
+    float radius = 0.30 + fi * 0.27 + band * 0.12;
     float w = 0.010 + 0.020 * band + 0.015 * uImpulse[LOMID];
 
     float petal = ring(sdCircle(p - vec2(radius, 0.0), 0.16 + 0.05 * band), w);
