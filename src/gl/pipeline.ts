@@ -4,6 +4,7 @@ import feedbackSrc from '../shaders/feedback.glsl?raw'
 import postSrc from '../shaders/post.glsl?raw'
 import type { AudioFrame } from '../audio/frame'
 import type { Scene } from '../scenes'
+import { WAVE_SIZE } from '../config'
 import { type Target, Uniforms, createProgram, createTarget, destroyTarget } from './context'
 import { uploadAudio } from './uniforms'
 
@@ -38,6 +39,7 @@ export type RenderOptions = { hue: number; trailBias: number }
  */
 export class Pipeline {
   private readonly vao: WebGLVertexArrayObject
+  private readonly waveTex: WebGLTexture
   private scenePasses: Pass[] = []
   private readonly feedback: Pass
   private readonly post: Pass
@@ -52,6 +54,13 @@ export class Pipeline {
     scenes: Scene[],
   ) {
     this.vao = gl.createVertexArray()!
+    this.waveTex = gl.createTexture()!
+    gl.bindTexture(gl.TEXTURE_2D, this.waveTex)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, WAVE_SIZE, 1, 0, gl.RED, gl.UNSIGNED_BYTE, null)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
     this.feedback = this.makePass(feedbackSrc, false, 'feedback')
     this.post = this.makePass(postSrc, false, 'post')
     this.loadScenes(scenes)
@@ -95,6 +104,9 @@ export class Pipeline {
     gl.disable(gl.BLEND)
     gl.disable(gl.DEPTH_TEST)
 
+    gl.bindTexture(gl.TEXTURE_2D, this.waveTex)
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, WAVE_SIZE, 1, gl.RED, gl.UNSIGNED_BYTE, frame.wave)
+
     const scenePass = this.scenePasses[index]
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.sceneTarget.fbo)
     gl.viewport(0, 0, this.sceneTarget.width, this.sceneTarget.height)
@@ -107,6 +119,7 @@ export class Pipeline {
       scene,
       opts.hue,
     )
+    scenePass.uniforms.tex('uWave', 2, this.waveTex)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, next.fbo)

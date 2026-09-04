@@ -82,6 +82,7 @@ export class AudioEngine {
     f.dt = dt
     f.time = now
 
+    this.onsetNode.getByteTimeDomainData(f.wave)
     this.bandNode.getFloatFrequencyData(this.bandDb)
     this.onsetNode.getFloatFrequencyData(this.onsetDb)
     dbToLinear(this.bandDb, this.bandMag)

@@ -1,3 +1,4 @@
+import wave from './wave.glsl?raw'
 import kali from './kali.glsl?raw'
 import droste from './droste.glsl?raw'
 import metatron from './metatron.glsl?raw'
@@ -23,6 +24,15 @@ const hex = (v: string): Rgb => [
 ]
 
 export const scenes: Scene[] = [
+  // First, so it is what you see on open: a flat line means no signal, and any
+  // movement means the capture path is live.
+  {
+    name: 'wave',
+    source: wave,
+    palette: [hex('#00E5FF'), hex('#9FFF00')],
+    resScale: 1.0,
+    feedback: { decay: 0.34, scale: 1.0, rotate: 0.0 },
+  },
   {
     name: 'kali',
     source: kali,

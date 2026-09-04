@@ -8,13 +8,22 @@ bun install
 bun run dev          # http://localhost:5273
 ```
 
-Click **mic** or **system audio** in the corner, then press `F`. With no source
+Click **system audio** or **mic** in the corner, then press `F`.
+
+**On headphones, use system audio.** The mic hears the room, so headphones give
+it nothing. System audio taps the stream inside macOS before it reaches any
+output device, so what you are listening on makes no difference. In Chrome'"'"'s
+picker choose **Entire Screen** and tick **Share system audio**.
+
+Scene `1` is the raw waveform: literal time-domain samples, ungated and
+unsmoothed. A flat line means nothing is arriving. It is the fastest way to
+tell whether the capture path is live. With no source
 connected it runs on a synthetic 145 BPM drive, so the screen is never dead.
 
 | key | |
 |---|---|
 | `space` | next scene |
-| `1`-`5` | pick scene |
+| `1`-`6` | pick scene (`1` is the raw waveform) |
 | `S` | cycle audio source |
 | `F` | fullscreen |
 | `P` | pause auto-cycle |

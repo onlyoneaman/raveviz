@@ -31,7 +31,7 @@ void main() {
 
   col *= smoothstep(1.25, 0.35, length(uv - 0.5) * 1.6);
   // Silence must look like silence, not like quiet music.
-  col *= mix(0.10, 1.0, smoothstep(0.0, 0.35, uEnergy));
+  col *= mix(0.35, 1.0, smoothstep(0.0, 0.35, uEnergy));
   col = mix(col, vec3(1.0), clamp(uDrop * 0.85, 0.0, 1.0));
   col = aces(col * (1.0 + 0.6 * uBuild));
 

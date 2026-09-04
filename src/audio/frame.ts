@@ -1,6 +1,8 @@
-import { BAND_COUNT } from '../config'
+import { BAND_COUNT, WAVE_SIZE } from '../config'
 
 export type AudioFrame = {
+  /** Raw time-domain samples, 128 = zero. Never gated: this is literal input. */
+  wave: Uint8Array<ArrayBuffer>
   bands: Float32Array
   norm: Float32Array
   impulse: Float32Array
@@ -32,6 +34,7 @@ export type AudioFrame = {
 
 export function createFrame(): AudioFrame {
   return {
+    wave: new Uint8Array(WAVE_SIZE).fill(128),
     bands: new Float32Array(BAND_COUNT),
     norm: new Float32Array(BAND_COUNT),
     impulse: new Float32Array(BAND_COUNT),

@@ -7,6 +7,8 @@ export const LOMID = 2
 export const MID = 3
 export const AIR = 4
 
+export const WAVE_SIZE = 1024
+
 export const audio = {
   fftBands: 4096,
   fftOnset: 1024,
@@ -40,7 +42,7 @@ export const audio = {
   silenceRms: 2e-3,
   silenceHoldS: 3,
   idleBpm: 145,
-  idleDepth: 0.10,
+  idleDepth: 0.05,
 }
 
 export const tempo = {
@@ -67,8 +69,8 @@ export const visual = {
   // With no audio the scenes still animated on wall-clock time and rendered at
   // 30-50% brightness, so silence looked identical to music. Motion and
   // brightness are now driven by the signal itself.
-  idleTimeScale: 0.12,
-  idleDim: 0.10,
+  idleTimeScale: 0.03,
+  idleDim: 0.35,
   energyAttackMs: 60,
   energyReleaseMs: 400,
 }

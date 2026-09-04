@@ -17,6 +17,10 @@ uniform float uEnergy;
 uniform float uHue;
 uniform vec3  uPalA;
 uniform vec3  uPalB;
+uniform sampler2D uWave;
+
+/** Time-domain sample at x in 0..1, returned in -1..1. */
+float waveAt(float x) { return texture(uWave, vec2(clamp(x, 0.0, 1.0), 0.5)).r * 2.0 - 1.0; }
 
 #define SUB   0
 #define BASS  1
