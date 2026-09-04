@@ -1,0 +1,19 @@
+{
+  "name": "raveviz",
+  "private": true,
+  "type": "module",
+  "author": "Aman [amankumar.ai]",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "shots": "python3 scripts/shots.py"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

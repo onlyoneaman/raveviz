@@ -1,0 +1,134 @@
+import { BAND_COUNT, BASS, MID, audio as cfg } from '../config'
+import {
+  AdaptiveNorm,
+  BandSplitter,
+  Envelopes,
+  dbToLinear,
+  rms,
+  spectralCentroid,
+  spectralFlatness,
+} from './analyser'
+import { type AudioFrame, createFrame } from './frame'
+import { OnsetDetector } from './onset'
+import { StructureTracker } from './structure'
+import { TempoTracker } from './tempo'
+import type { Source } from './source'
+
+/**
+ * A single FFT size cannot serve both jobs: band levels want frequency
+ * resolution in the sub range, onset detection wants time resolution. Both run
+ * with the browser's own smoothing off, since it is a fixed exponential that
+ * destroys spectral flux.
+ */
+export class AudioEngine {
+  readonly ctx: AudioContext
+  private readonly bandNode: AnalyserNode
+  private readonly onsetNode: AnalyserNode
+  private readonly bandDb: Float32Array<ArrayBuffer>
+  private readonly bandMag: Float32Array<ArrayBuffer>
+  private readonly onsetDb: Float32Array<ArrayBuffer>
+  private readonly onsetMag: Float32Array<ArrayBuffer>
+  private readonly splitter: BandSplitter
+  private readonly envelopes = new Envelopes()
+  private readonly norm = new AdaptiveNorm()
+  private readonly onsets: OnsetDetector
+  private readonly raw = new Float32Array(BAND_COUNT)
+
+  readonly tempo = new TempoTracker()
+  readonly structure = new StructureTracker()
+  readonly frame: AudioFrame = createFrame()
+
+  source: Source | null = null
+  private silentFor = 0
+
+  constructor() {
+    this.ctx = new AudioContext({ latencyHint: 'interactive' })
+
+    this.bandNode = this.ctx.createAnalyser()
+    this.bandNode.fftSize = cfg.fftBands
+    this.bandNode.smoothingTimeConstant = 0
+
+    this.onsetNode = this.ctx.createAnalyser()
+    this.onsetNode.fftSize = cfg.fftOnset
+    this.onsetNode.smoothingTimeConstant = 0
+
+    this.bandDb = new Float32Array(this.bandNode.frequencyBinCount)
+    this.bandMag = new Float32Array(this.bandNode.frequencyBinCount)
+    this.onsetDb = new Float32Array(this.onsetNode.frequencyBinCount)
+    this.onsetMag = new Float32Array(this.onsetNode.frequencyBinCount)
+
+    this.splitter = new BandSplitter(this.ctx.sampleRate, cfg.fftBands)
+    this.onsets = new OnsetDetector(this.ctx.sampleRate, cfg.fftOnset)
+  }
+
+  async connect(source: Source) {
+    this.disconnect()
+    this.source = source
+    source.node.connect(this.bandNode)
+    source.node.connect(this.onsetNode)
+    if (this.ctx.state === 'suspended') await this.ctx.resume()
+  }
+
+  disconnect() {
+    this.source?.stop()
+    this.source = null
+  }
+
+  tick(dt: number, now: number): AudioFrame {
+    const f = this.frame
+    f.dt = dt
+    f.time = now
+
+    this.bandNode.getFloatFrequencyData(this.bandDb)
+    this.onsetNode.getFloatFrequencyData(this.onsetDb)
+    dbToLinear(this.bandDb, this.bandMag)
+    dbToLinear(this.onsetDb, this.onsetMag)
+
+    f.rms = rms(this.bandMag)
+    f.centroid = spectralCentroid(this.bandMag, this.ctx.sampleRate, cfg.fftBands)
+    f.flatness = spectralFlatness(this.bandMag)
+
+    this.silentFor = f.rms < cfg.silenceRms ? this.silentFor + dt : 0
+    f.silent = this.silentFor > cfg.silenceHoldS
+
+    this.splitter.split(this.bandMag, this.raw)
+    this.envelopes.process(this.raw, dt, f.bands)
+    this.norm.process(f.bands, dt, f.norm)
+
+    this.onsets.process(this.onsetMag, dt, now)
+    f.impulse.set(this.onsets.impulse)
+    f.events = this.onsets.events
+
+    if (f.events & (1 << BASS)) this.tempo.onKick(now)
+    this.tempo.update(dt, cfg.idleBpm)
+    f.bpm = this.tempo.bpm
+    f.phase = this.tempo.phase
+    f.beat = this.tempo.beat
+    f.bar = this.tempo.bar
+    f.phrase = this.tempo.phrase
+    f.confidence = this.tempo.confidence
+
+    this.structure.update(f.norm, f.centroid, f.rms, dt, now)
+    f.build = this.structure.build
+    f.drop = this.structure.drop
+
+    if (f.silent) this.idle(f, now)
+    return f
+  }
+
+  /** Never leave a dead screen: drive the scenes from a synthetic pulse. */
+  private idle(f: AudioFrame, now: number) {
+    const beat = (now * cfg.idleBpm) / 60
+    const pulse = Math.pow(1 - (beat % 1), 6)
+    for (let b = 0; b < BAND_COUNT; b++) {
+      const wob = 0.5 + 0.5 * Math.sin(now * (0.3 + b * 0.17) + b)
+      f.norm[b] = 0.25 * wob + (b <= BASS ? 0.6 * pulse : 0.15 * pulse)
+      f.impulse[b] = b <= BASS ? pulse : pulse * 0.4
+    }
+    f.bpm = cfg.idleBpm
+    f.confidence = 0
+    f.centroid = 1200 + 400 * Math.sin(now * 0.2)
+    f.build = 0.5 + 0.5 * Math.sin(now * 0.05)
+    f.norm[MID] = Math.max(f.norm[MID], 0.3)
+  }
+}

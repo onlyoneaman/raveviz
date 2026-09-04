@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>raveviz</title>
+    <style>
+      :root { color-scheme: dark; --ink: #d7e0e6; --dim: #6c7b85; --acid: #9fff00; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+      #stage { display: block; width: 100vw; height: 100vh; }
+
+      .hud {
+        position: fixed; left: 18px; bottom: 16px; z-index: 2;
+        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: var(--ink); letter-spacing: .02em;
+        text-shadow: 0 1px 3px #000; transition: opacity .5s ease;
+        pointer-events: none;
+      }
+      .hud.idle { opacity: 0; }
+      .hud.hidden { display: none; }
+      .hud-row { display: flex; align-items: baseline; gap: 10px; }
+      .brand { color: var(--acid); font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+      .stat { color: var(--dim); }
+
+      .meters { display: flex; gap: 4px; margin: 8px 0; }
+      .meter { width: 46px; height: 3px; background: #ffffff1c; overflow: hidden; }
+      .meter i { display: block; height: 100%; background: var(--acid); transform-origin: left; transform: scaleX(0); }
+
+      .sources { display: flex; gap: 6px; margin-bottom: 8px; pointer-events: auto; }
+      .sources button {
+        font: inherit; color: var(--dim); background: #ffffff10; border: 0;
+        padding: 4px 9px; cursor: pointer; border-radius: 2px; max-width: 190px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .sources button:hover { color: var(--ink); background: #ffffff22; }
+      .sources button.active { color: #000; background: var(--acid); }
+
+      .keys { display: flex; flex-wrap: wrap; gap: 12px; color: #4d5a63; }
+      .keys b { color: var(--dim); font-weight: 500; margin-right: 5px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
