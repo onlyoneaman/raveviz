@@ -45,6 +45,16 @@ export async function openMic(ctx: AudioContext, deviceId?: string): Promise<Sou
  * Audio-only display capture is not permitted, so video must be requested and
  * then immediately dropped. Requires Chrome 141+ on macOS 14.2+.
  */
+/** Labels are empty until mic permission has been granted at least once. */
+export async function listInputs(): Promise<MediaDeviceInfo[]> {
+  const devices = await navigator.mediaDevices.enumerateDevices()
+  return devices.filter((d) => d.kind === 'audioinput' && d.deviceId !== 'default')
+}
+
+/** A loopback device carries system audio with no picker and no screen share. */
+export const isLoopback = (label: string) =>
+  /blackhole|loopback|soundflower|virtual|aggregate|multi-output/i.test(label)
+
 export async function openSystem(ctx: AudioContext): Promise<Source> {
   const stream = await navigator.mediaDevices.getDisplayMedia({
     video: true,

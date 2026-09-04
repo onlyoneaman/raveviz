@@ -5,8 +5,8 @@ vec3 scene(vec2 uv) {
   float x = uv.x / aspect * 0.5 + 0.5;
 
   float s = waveAt(x);
-  float amp = 0.62;
-  float thickness = 0.006 + 0.010 * uNorm[BASS];
+  float amp = 0.86;
+  float thickness = 0.009 + 0.014 * uNorm[BASS];
 
   float d = abs(uv.y - s * amp);
   float line = smoothstep(thickness, 0.0, d);
@@ -18,12 +18,15 @@ vec3 scene(vec2 uv) {
   float lo = min(min(prev, next), s) * amp, hi = max(max(prev, next), s) * amp;
   line = max(line, smoothstep(thickness, 0.0, max(0.0, max(lo - uv.y, uv.y - hi))));
 
+  // Mirrored ghost, so a wide screen reads as a band rather than one thin line.
+  float ghost = smoothstep(thickness * 1.6, 0.0, abs(uv.y + s * amp)) * 0.22;
   float axis = smoothstep(0.0018, 0.0, abs(uv.y)) * 0.18;
   float ticks = smoothstep(0.9, 1.0, abs(fract(x * 16.0) * 2.0 - 1.0))
               * smoothstep(0.035, 0.0, abs(uv.y)) * 0.25;
 
   vec3 col = pal(0.15 + 0.7 * abs(s)) * (line * 2.4 + halo * 0.28);
   col += pal(0.05) * (axis + ticks);
+  col += pal(0.55) * ghost;
   col += pal(1.0) * line * uImpulse[BASS] * 1.1;
   return col;
 }

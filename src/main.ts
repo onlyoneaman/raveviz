@@ -1,5 +1,5 @@
 import { AudioEngine } from './audio/engine'
-import { openMic, openSystem } from './audio/source'
+import { isLoopback, listInputs, openMic, openSystem } from './audio/source'
 import { createContext } from './gl/context'
 import { ResolutionGovernor } from './gl/governor'
 import { Pipeline } from './gl/pipeline'
@@ -37,7 +37,7 @@ async function pick(open: () => Promise<Awaited<ReturnType<typeof openMic>>>) {
   } catch (err) {
     const message = (err as Error).message
     hud.say(message.includes('Permission') || message.includes('denied') ? 'Permission denied.' : message)
-    refreshSources()
+    await refreshSources()
     return
   }
   hud.say('')
@@ -51,10 +51,15 @@ const SOURCES = [
   { label: 'mic', open: () => openMic(engine.ctx) },
 ]
 
-function refreshSources() {
+async function refreshSources() {
+  // Loopback devices first: they are the no-picker route to system audio.
+  const devices = (await listInputs().catch(() => [])).filter((d) => isLoopback(d.label))
   hud.setSources(
-    SOURCES.map((s) => ({ label: s.label, onPick: () => pick(s.open) })),
-    engine.source?.kind === 'system' ? 'system audio' : engine.source ? 'mic' : '',
+    [
+      ...devices.map((d) => ({ label: d.label.replace(/\s*\(.*\)$/, ''), onPick: () => pick(() => openMic(engine.ctx, d.deviceId)) })),
+      ...SOURCES.map((s) => ({ label: s.label, onPick: () => pick(s.open) })),
+    ],
+    engine.source?.label.replace(/\s*\(.*\)$/, '') ?? '',
   )
 }
 
