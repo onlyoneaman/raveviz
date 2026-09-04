@@ -116,7 +116,10 @@ export const camera = {
 }
 
 export const show = {
-  phrasesPerScene: 1,
+  // Changes used to land on the 64-beat phrase, about 26s at 145bpm, which is
+  // an age. Drawn fresh each time so the set does not feel scheduled.
+  beatsPerSceneMin: 12,
+  beatsPerSceneMax: 40,
   autoCycle: true,
   hudIdleMs: 3000,
 }

@@ -22,6 +22,7 @@ uniform float uCamSpin;
 uniform float uCamZoom;
 uniform sampler2D uWave;
 uniform sampler2D uSpectrum;
+uniform sampler2D uOm;
 uniform float uNyquist;
 uniform float uKickZoom;
 uniform float uKickFlash;
@@ -29,6 +30,24 @@ uniform float uBloom;
 
 /** Time-domain sample at x in 0..1, returned in -1..1. */
 float waveAt(float x) { return texture(uWave, vec2(clamp(x, 0.0, 1.0), 0.5)).r * 2.0 - 1.0; }
+
+/** Coverage of the Om glyph at p, where the glyph fills roughly -1..1. */
+float omAt(vec2 p) {
+  vec2 uv = p * 0.5 + 0.5;
+  uv.y = 1.0 - uv.y;
+  vec2 inside = step(vec2(0.0), uv) * step(uv, vec2(1.0));
+  return texture(uOm, uv).r * inside.x * inside.y;
+}
+
+/** Signed distance to an equilateral triangle of radius r, point up. */
+float sdTriangle(vec2 p, float r) {
+  const float K = 1.7320508;
+  p.x = abs(p.x) - r;
+  p.y = p.y + r / K;
+  if (p.x + K * p.y > 0.0) p = vec2(p.x - K * p.y, -K * p.x - p.y) / 2.0;
+  p.x -= clamp(p.x, -2.0 * r, 0.0);
+  return -length(p) * sign(p.y);
+}
 
 /** Magnitude 0..1 at x in 0..1, log-spaced across 20Hz to 16kHz. */
 float specAt(float x) {

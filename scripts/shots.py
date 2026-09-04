@@ -23,7 +23,7 @@ URL = "http://localhost:5273/"
 SCENES = [
     "wave", "radial", "vortex", "droste", "mandala", "metatron", "kali",
     "mandelbulb", "girder", "moire", "beams", "sunset", "discoball", "prism",
-    "strobe",
+    "sonar", "liquid", "neon", "burst", "yantra", "strobe",
 ]
 SETTLE_MS = 2200
 

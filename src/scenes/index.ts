@@ -8,6 +8,11 @@ import beams from './beams.glsl?raw'
 import sunset from './sunset.glsl?raw'
 import discoball from './discoball.glsl?raw'
 import prism from './prism.glsl?raw'
+import sonar from './sonar.glsl?raw'
+import liquid from './liquid.glsl?raw'
+import neon from './neon.glsl?raw'
+import burst from './burst.glsl?raw'
+import yantra from './yantra.glsl?raw'
 import kali from './kali.glsl?raw'
 import droste from './droste.glsl?raw'
 import metatron from './metatron.glsl?raw'
@@ -157,6 +162,46 @@ export const scenes: Scene[] = [
     palette: [hex('#FF4FD8'), hex('#35E8FF')],
     resScale: 1.0,
     feedback: { decay: 0.58, scale: 0.998, rotate: 0.002 },
+  },
+  {
+    name: 'sonar',
+    source: sonar,
+    palette: [hex('#2B3BFF'), hex('#8FD4FF')],
+    resScale: 1.0,
+    feedback: { decay: 0.50, scale: 1.0, rotate: 0.0 },
+    camera: false,
+    bloom: 0.5,
+    accent: false,
+  },
+  {
+    name: 'liquid',
+    source: liquid,
+    palette: [hex('#FF2D95'), hex('#25E7FF')],
+    resScale: 0.85,
+    feedback: { decay: 0.55, scale: 1.0, rotate: 0.0 },
+  },
+  {
+    name: 'neon',
+    source: neon,
+    palette: [hex('#FF1E56'), hex('#3B6BFF')],
+    resScale: 1.0,
+    feedback: { decay: 0.52, scale: 1.0, rotate: 0.0 },
+    camera: false,
+    accent: false,
+  },
+  {
+    name: 'burst',
+    source: burst,
+    palette: [hex('#FF4FD8'), hex('#35E8FF')],
+    resScale: 1.0,
+    feedback: { decay: 0.72, scale: 0.99, rotate: 0.003 },
+  },
+  {
+    name: 'yantra',
+    source: yantra,
+    palette: [hex('#FFB000'), hex('#FF2D55')],
+    resScale: 1.0,
+    feedback: { decay: 0.66, scale: 0.998, rotate: 0.002 },
   },
   {
     name: 'strobe',

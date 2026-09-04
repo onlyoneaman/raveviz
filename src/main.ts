@@ -27,7 +27,7 @@ const MODES: TransitionMode[] = ['fade', 'burn', 'burn', 'flash', 'cut']
 let locked = !show.autoCycle
 let hue = 0
 let trailBias = 1
-let lastPhrase = -1
+let nextChangeBeat = 0
 let fps = 60
 let notes = ''
 let accent = pickAccent(initialScenes, 0.3)
@@ -50,8 +50,9 @@ function setScene(next: number) {
       ? 0.06
       : camera.blendMinS + Math.random() * (camera.blendMaxS - camera.blendMinS)
   sceneIndex = target
-  hue += 0.25
+  hue = (Math.random() - 0.5) * 0.6
   rollCamera()
+  nextChangeBeat = 0
 }
 
 /** Jump somewhere else in the set rather than stepping through it in order. */
@@ -61,6 +62,10 @@ function jumpScene() {
   while (next === sceneIndex) next = Math.floor(Math.random() * scenes.length)
   setScene(next)
 }
+
+const nextInterval = () =>
+  show.beatsPerSceneMin +
+  Math.floor(Math.random() * (show.beatsPerSceneMax - show.beatsPerSceneMin + 1))
 
 function rollCamera() {
   const dir = Math.random() < 0.5 ? -1 : 1
@@ -151,11 +156,13 @@ function loop(now: number) {
 
   // Cycling while nothing is playing makes the app look like it is inventing
   // structure. Hold the scene until there is a signal.
-  if (frame.phrase !== lastPhrase) {
-    if (lastPhrase >= 0 && !locked && !frame.silent) jumpScene()
-    lastPhrase = frame.phrase
+  if (frame.silent) {
+    nextChangeBeat = frame.beat + nextInterval()
+  } else if (frame.beat >= nextChangeBeat) {
+    if (nextChangeBeat > 0 && !locked) jumpScene()
+    nextChangeBeat = frame.beat + nextInterval()
   }
-  hue += dt * 0.008
+  hue += dt * 0.005
 
   blend = Math.min(1, blend + dt / blendS)
   if (blend >= 1) fromIndex = null

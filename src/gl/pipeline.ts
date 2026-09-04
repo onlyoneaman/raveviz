@@ -5,6 +5,7 @@ import postSrc from '../shaders/post.glsl?raw'
 import type { AudioFrame } from '../audio/frame'
 import type { Scene } from '../scenes'
 import { SPECTRUM_SIZE, WAVE_SIZE } from '../config'
+import { createGlyphTexture } from './glyph'
 import { type Target, Uniforms, createProgram, createTarget, destroyTarget } from './context'
 import { uploadAudio } from './uniforms'
 
@@ -70,6 +71,7 @@ export class Pipeline {
   private readonly vao: WebGLVertexArrayObject
   private readonly waveTex: WebGLTexture
   private readonly specTex: WebGLTexture
+  private readonly omTex: WebGLTexture
   private scenePasses: Pass[] = []
   private readonly feedback: Pass
   private readonly post: Pass
@@ -86,6 +88,7 @@ export class Pipeline {
     this.vao = gl.createVertexArray()!
     this.waveTex = this.makeDataTexture(WAVE_SIZE)
     this.specTex = this.makeDataTexture(SPECTRUM_SIZE)
+    this.omTex = createGlyphTexture(gl, '\u0950')
     const _unused = gl.createTexture()!
     gl.deleteTexture(_unused)
     this.feedback = this.makePass(feedbackSrc, false, 'feedback')
@@ -204,6 +207,7 @@ export class Pipeline {
     )
     pass.uniforms.tex('uWave', 2, this.waveTex)
     pass.uniforms.tex('uSpectrum', 3, this.specTex)
+    pass.uniforms.tex('uOm', 4, this.omTex)
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 3)
   }
 }
