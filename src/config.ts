@@ -19,8 +19,17 @@ export const audio = {
   normFloorGate: 1e-4,
 
   fluxWindow: 43,
-  fluxThresholdMul: 1.5,
-  fluxThresholdAdd: 0.008,
+  fluxThresholdMul: 3.0,
+  // Relative to each band's own recent peak flux. A fixed additive term cannot
+  // work here: the air band spreads its energy over ~300 bins and the sub over
+  // ~2, so one constant is either deaf up top or trigger-happy down low.
+  // Detection of real onsets is flat across a wide range of these two, so they
+  // are set where false positives vanish rather than where detection peaks.
+  // Sub stays noisy at ~10% regardless: it is one bin at the onset FFT size.
+  // Nothing consumes sub onsets (tempo uses bass, the shaders use bass/mid/air).
+  fluxThresholdRatio: 0.5,
+  fluxThresholdFloor: 1e-6,
+  fluxPeakDecayS: 2.0,
   refractoryMs: [90, 60, 50, 45, 40],
   impulseDecayMs: 160,
 

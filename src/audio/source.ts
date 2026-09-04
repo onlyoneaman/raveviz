@@ -33,6 +33,7 @@ function attach(ctx: AudioContext, stream: MediaStream, kind: SourceKind, label:
   }
 }
 
+/** `deviceId` reaches a virtual loopback device such as BlackHole. */
 export async function openMic(ctx: AudioContext, deviceId?: string): Promise<Source> {
   const audio = deviceId ? { ...RAW_AUDIO, deviceId: { exact: deviceId } } : RAW_AUDIO
   const stream = await navigator.mediaDevices.getUserMedia({ audio })
@@ -59,9 +60,4 @@ export async function openSystem(ctx: AudioContext): Promise<Source> {
     throw new Error('No audio track. Tick "Share audio" in the picker.')
   }
   return attach(ctx, stream, 'system', stream.getAudioTracks()[0].label || 'system audio')
-}
-
-export async function listInputs(): Promise<MediaDeviceInfo[]> {
-  const devices = await navigator.mediaDevices.enumerateDevices()
-  return devices.filter((d) => d.kind === 'audioinput' && d.deviceId !== 'default')
 }

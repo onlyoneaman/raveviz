@@ -103,11 +103,11 @@ describe('OnsetDetector', () => {
   const bins = FFT_ON / 2
 
   /** Steady bass floor, with a wideband spike every `period` frames. */
-  function run(periodFrames: number, frames: number, spikeGain: number) {
+  function run(periodFrames: number, frames: number, spikeGain: number, floor: 'modulated' | 'random' | 'flat' = 'modulated') {
     const det = new OnsetDetector(SR, FFT_ON)
     const mag = new Float32Array(bins)
     const dt = 1 / 60
-    let fired = 0
+    const fired = [0, 0, 0, 0, 0]
     const at: number[] = []
 
     for (let i = 0; i < frames; i++) {
@@ -115,16 +115,17 @@ describe('OnsetDetector', () => {
       for (let k = 0; k < bins; k++) {
         const hz = (k * SR) / FFT_ON
         const inBass = hz > 60 && hz < 150
-        mag[k] = 0.02 * (0.5 + 0.5 * Math.sin(k * 0.7 + i))
+        mag[k] =
+          floor === 'flat' ? 0.02
+          : floor === 'random' ? 0.02 * Math.random()
+          : 0.02 * (0.5 + 0.5 * Math.sin(k * 0.7 + i))
         if (spike && inBass) mag[k] += spikeGain
       }
       det.process(mag, dt, i * dt)
-      if (det.events & (1 << BASS)) {
-        fired++
-        at.push(i)
-      }
+      for (let b = 0; b < BAND_COUNT; b++) if (det.events & (1 << b)) fired[b]++
+      if (det.events & (1 << BASS)) at.push(i)
     }
-    return { fired, at }
+    return { fired: fired[BASS], perBand: fired, at }
   }
 
   test('fires once per impulse and not between them', () => {
@@ -136,8 +137,15 @@ describe('OnsetDetector', () => {
     expect(fired).toBeLessThanOrEqual(expected + 1)
   })
 
-  test('does not fire on sustained noise with no onsets', () => {
-    expect(run(0, 400, 0).fired).toBe(0)
+  test('never fires on a spectrum that is not changing', () => {
+    expect(run(0, 400, 0, 'flat').fired).toBe(0)
+  })
+
+  // Sub is excluded deliberately: it is a single bin at the onset FFT size, so
+  // its flux is dominated by noise. Nothing downstream consumes sub onsets.
+  test('does not fire on stationary random noise', () => {
+    const { perBand } = run(0, 900, 0, 'random')
+    for (const band of [BASS, 2, 3, 4]) expect(perBand[band] / 900).toBeLessThan(0.02)
   })
 
   test('stays quiet during the warm-up window', () => {

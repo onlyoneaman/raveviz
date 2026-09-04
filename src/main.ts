@@ -1,5 +1,5 @@
 import { AudioEngine } from './audio/engine'
-import { listInputs, openMic, openSystem } from './audio/source'
+import { openMic, openSystem } from './audio/source'
 import { createContext } from './gl/context'
 import { ResolutionGovernor } from './gl/governor'
 import { Pipeline } from './gl/pipeline'
@@ -37,21 +37,20 @@ async function pick(open: () => Promise<Awaited<ReturnType<typeof openMic>>>) {
   } catch (err) {
     notes = ` · ${(err as Error).message}`
   }
-  await refreshSources()
+  refreshSources()
 }
 
-async function refreshSources() {
-  const devices = await listInputs().catch(() => [])
+// System audio first: it is the default, and the one that needs a click because
+// getDisplayMedia requires a user gesture and cannot be opened on load.
+const SOURCES = [
+  { label: 'system audio', open: () => openSystem(engine.ctx) },
+  { label: 'mic', open: () => openMic(engine.ctx) },
+]
+
+function refreshSources() {
   hud.setSources(
-    [
-      { label: 'mic', onPick: () => pick(() => openMic(engine.ctx)) },
-      { label: 'system audio', onPick: () => pick(() => openSystem(engine.ctx)) },
-      ...devices.map((d) => ({
-        label: d.label || 'input',
-        onPick: () => pick(() => openMic(engine.ctx, d.deviceId)),
-      })),
-    ],
-    engine.source?.label ?? '',
+    SOURCES.map((s) => ({ label: s.label, onPick: () => pick(s.open) })),
+    engine.source?.kind === 'system' ? 'system audio' : engine.source ? 'mic' : '',
   )
 }
 
@@ -80,11 +79,10 @@ addEventListener('keydown', (event) => {
   else if (key === 's') cycleSource()
 })
 
-let sourceCursor = 0
+let sourceCursor = -1
 async function cycleSource() {
-  const openers = [() => openMic(engine.ctx), () => openSystem(engine.ctx)]
-  sourceCursor = (sourceCursor + 1) % openers.length
-  await pick(openers[sourceCursor])
+  sourceCursor = (sourceCursor + 1) % SOURCES.length
+  await pick(SOURCES[sourceCursor].open)
 }
 
 let last = performance.now()
@@ -118,7 +116,13 @@ refreshSources()
 requestAnimationFrame(loop)
 
 if (import.meta.env.DEV) {
-  Object.assign(window, { raveviz: { engine, get frame() { return engine.frame }, get scene() { return scenes[sceneIndex] } } })
+  Object.assign(window, {
+    raveviz: {
+      engine,
+      get frame() { return engine.frame },
+      get scene() { return scenes[sceneIndex] },
+    },
+  })
 }
 
 if (import.meta.hot) {

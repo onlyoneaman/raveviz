@@ -15,6 +15,7 @@ export class OnsetDetector {
   private readonly scratch: Float32Array
   private readonly lastFireAt = new Float32Array(BAND_COUNT)
   private readonly prevFlux = new Float32Array(BAND_COUNT)
+  private readonly fluxPeak = new Float32Array(BAND_COUNT)
   private cursor = 0
   private filled = 0
 
@@ -33,6 +34,7 @@ export class OnsetDetector {
   process(mag: Float32Array, dt: number, now: number) {
     this.events = 0
     const decay = 1 - coeff(audio.impulseDecayMs, dt)
+    const peakKeep = Math.exp(-dt / audio.fluxPeakDecayS)
 
     for (let b = 0; b < BAND_COUNT; b++) {
       let f = 0
@@ -43,7 +45,11 @@ export class OnsetDetector {
       f /= this.splitter.hi[b] - this.splitter.lo[b]
       this.flux[b] = f
 
-      const threshold = this.median(b) * audio.fluxThresholdMul + audio.fluxThresholdAdd
+      this.fluxPeak[b] = Math.max(f, this.fluxPeak[b] * peakKeep)
+      const threshold =
+        this.median(b) * audio.fluxThresholdMul +
+        this.fluxPeak[b] * audio.fluxThresholdRatio +
+        audio.fluxThresholdFloor
       const rising = f > this.prevFlux[b]
       const past = now - this.lastFireAt[b] > audio.refractoryMs[b] / 1000
 
