@@ -127,7 +127,12 @@ export class AudioEngine {
       (loudest - this.energy) * coeff(rising ? visual.energyAttackMs : visual.energyReleaseMs, dt)
     f.energy = this.energy
 
-    this.visualClock += dt * (visual.idleTimeScale + (1 - visual.idleTimeScale) * this.energy)
+    const t = Math.min(
+      1,
+      Math.max(0, (this.energy - visual.energyKnee) / (visual.energyFull - visual.energyKnee)),
+    )
+    const speed = visual.idleTimeScale + (1 - visual.idleTimeScale) * (t * t * (3 - 2 * t))
+    this.visualClock += dt * speed
     f.visualTime = this.visualClock
 
     return f

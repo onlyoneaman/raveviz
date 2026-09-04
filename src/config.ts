@@ -15,7 +15,7 @@ export const audio = {
   fftOnset: 1024,
 
   attackMs: [8, 10, 14, 18, 22],
-  releaseMs: [90, 120, 140, 160, 200],
+  releaseMs: [70, 85, 100, 115, 140],
 
   peakDecayS: 2.0,
   floorRiseS: 4.0,
@@ -38,7 +38,7 @@ export const audio = {
   fluxThresholdFloor: 1e-6,
   fluxPeakDecayS: 2.0,
   refractoryMs: [90, 60, 50, 45, 40],
-  impulseDecayMs: 160,
+  impulseDecayMs: 125,
 
   silenceRms: 2e-3,
   silenceHoldS: 3,
@@ -72,6 +72,13 @@ export const visual = {
   // brightness are now driven by the signal itself.
   idleTimeScale: 0.03,
   idleDim: 0.35,
+  // Below `energyKnee` the clock is idle-slow; above `energyFull` it runs at
+  // full speed. A linear ramp left the scenes visibly drifting on silence.
+  energyKnee: 0.1,
+  energyFull: 0.55,
+  // How hard a kick punches the whole frame, on top of whatever a scene does.
+  kickZoom: 0.05,
+  kickFlash: 0.4,
   energyAttackMs: 60,
   energyReleaseMs: 400,
 }

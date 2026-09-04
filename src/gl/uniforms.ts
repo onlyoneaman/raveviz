@@ -1,4 +1,5 @@
 import type { AudioFrame } from '../audio/frame'
+import { visual } from '../config'
 import type { Scene } from '../scenes'
 import type { Uniforms } from './context'
 
@@ -15,6 +16,8 @@ export function uploadAudio(
   u.f('uTime', f.visualTime)
   u.f('uEnergy', f.energy)
   u.f('uNyquist', f.nyquist)
+  u.f('uKickZoom', visual.kickZoom)
+  u.f('uKickFlash', visual.kickFlash)
   u.fv('uNorm', f.norm)
   u.fv('uImpulse', f.impulse)
   u.f('uRms', f.rms)

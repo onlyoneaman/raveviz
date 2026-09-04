@@ -20,6 +20,8 @@ uniform vec3  uPalB;
 uniform sampler2D uWave;
 uniform sampler2D uSpectrum;
 uniform float uNyquist;
+uniform float uKickZoom;
+uniform float uKickFlash;
 
 /** Time-domain sample at x in 0..1, returned in -1..1. */
 float waveAt(float x) { return texture(uWave, vec2(clamp(x, 0.0, 1.0), 0.5)).r * 2.0 - 1.0; }

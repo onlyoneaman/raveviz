@@ -26,7 +26,13 @@ vec3 bloom(vec2 uv, float radius) {
 void main() {
   vec2 uv = gl_FragCoord.xy / uRes;
 
-  vec3 col = aberrated(uv, 0.002 + 0.014 * uNorm[BASS] + 0.030 * uDrop);
+  // Whole-frame punch on the kick, so every scene reacts even if its own
+  // shader barely does.
+  float punch = uImpulse[SUB] * 0.4 + uImpulse[BASS];
+  uv = 0.5 + (uv - 0.5) * (1.0 - uKickZoom * punch - 0.04 * uDrop);
+
+  vec3 col = aberrated(uv, 0.002 + 0.022 * uNorm[BASS] + 0.030 * uDrop);
+  col *= 1.0 + uKickFlash * punch;
   col += bloom(uv, 0.020 + 0.020 * uNorm[AIR]) * (0.9 + 1.1 * uNorm[AIR]);
 
   col *= smoothstep(1.25, 0.35, length(uv - 0.5) * 1.6);
