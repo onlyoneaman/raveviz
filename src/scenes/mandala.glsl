@@ -29,5 +29,5 @@ vec3 scene(vec2 uv) {
   col += pal(1.0) * eye * 1.6;
   col += pal(0.9) * exp(-9.0 * r0) * (0.25 + uImpulse[BASS] * 1.5);
 
-  return col * (0.45 + 0.8 * uNorm[BASS]);
+  return col * (0.18 + 1.20 * uNorm[BASS]);
 }

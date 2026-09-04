@@ -60,5 +60,5 @@ vec3 scene(vec2 uv) {
   }
   // Halo from near-misses only, so the interior never floods to white.
   col += pal(0.85) * exp(-40.0 * near) * 0.35;
-  return col * (0.5 + 0.8 * uNorm[BASS]);
+  return col * (0.20 + 1.10 * uNorm[BASS]);
 }

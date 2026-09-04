@@ -12,5 +12,5 @@ vec3 scene(vec2 uv) {
 
   vec3 col = pal(fract(r * 1.5 + uTime * 0.05)) * (rings * 0.9 + spoke * 0.5);
   col += pal(0.9) * core * 1.2;
-  return col * (0.28 + 0.75 * uNorm[BASS]);
+  return col * (0.14 + 1.10 * uNorm[BASS]);
 }

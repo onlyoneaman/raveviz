@@ -18,5 +18,5 @@ vec3 scene(vec2 uv) {
   vec3 col = pal(fract(z * 0.15 + band * 0.5)) * (wall * 2.0 + ribs * 0.55);
   col += pal(1.0) * core;
   col *= smoothstep(0.0, 0.22, r);
-  return col * (0.5 + 0.8 * uNorm[BASS]);
+  return col * (0.18 + 1.20 * uNorm[BASS]);
 }

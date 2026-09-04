@@ -1,11 +1,13 @@
 import { BAND_COUNT, BASS, audio as cfg, visual } from '../config'
 import {
   AdaptiveNorm,
+  audibility,
   coeff,
   BandSplitter,
   Envelopes,
   dbToLinear,
   rms,
+  waveRms,
   spectralCentroid,
   spectralFlatness,
 } from './analyser'
@@ -90,6 +92,7 @@ export class AudioEngine {
     dbToLinear(this.bandDb, this.bandMag)
     dbToLinear(this.onsetDb, this.onsetMag)
 
+    f.level = waveRms(f.wave)
     f.rms = rms(this.bandMag)
     f.centroid = spectralCentroid(this.bandMag, this.ctx.sampleRate, cfg.fftBands)
     f.flatness = spectralFlatness(this.bandMag)
@@ -97,12 +100,17 @@ export class AudioEngine {
     // The hold stops a quiet passage of real audio flapping into idle. With no
     // source connected there is nothing to flap, so do not make a fresh load
     // sit dead for three seconds before anything moves.
-    this.silentFor = f.rms < cfg.silenceRms ? this.silentFor + dt : 0
+    this.silentFor = f.level < cfg.silenceLevel ? this.silentFor + dt : 0
     f.silent = this.source === null || this.silentFor > cfg.silenceHoldS
 
     this.splitter.split(this.bandMag, this.raw)
     this.envelopes.process(this.raw, dt, f.bands)
     this.norm.process(f.bands, dt, f.norm)
+
+    // One global gate from real amplitude, applied after the per-band relative
+    // normalization, so quiet music still uses the full visual range.
+    const audible = audibility(f.level)
+    for (let b = 0; b < BAND_COUNT; b++) f.norm[b] *= audible
 
     this.onsets.process(this.onsetMag, dt, now)
     f.impulse.set(this.onsets.impulse)

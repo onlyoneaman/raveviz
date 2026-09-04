@@ -31,5 +31,5 @@ vec3 scene(vec2 uv) {
   float t = fract(atan(p.y, p.x) / TAU + 0.5 + glow * 0.3 + uPhrase * 0.13);
   vec3 col = pal(t) * (glow * 3.0 + shape * 0.5);
   col += pal(1.0) * shape * (0.20 + 0.9 * uImpulse[BASS]);
-  return col * (0.5 + 0.8 * uNorm[BASS]);
+  return col * (0.18 + 1.20 * uNorm[BASS]);
 }

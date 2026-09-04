@@ -69,13 +69,7 @@ export class AdaptiveNorm {
       this.peak[b] = Math.max(v, this.peak[b] * peakKeep)
       this.floor[b] = Math.min(v, this.floor[b] + (v - this.floor[b]) * floorRise)
       const span = this.peak[b] - this.floor[b]
-      const scaled = span > audio.normFloorGate ? clamp01((v - this.floor[b]) / span) : 0
-      // Fade the whole band out when it is objectively quiet, not merely quiet
-      // relative to its own recent history.
-      const audible = clamp01(
-        (this.peak[b] - audio.normQuietPeak) / (audio.normLoudPeak - audio.normQuietPeak),
-      )
-      out[b] = scaled * audible
+      out[b] = span > audio.normFloorGate ? clamp01((v - this.floor[b]) / span) : 0
     }
     return out
   }
@@ -113,6 +107,24 @@ export function spectralFlatness(mag: Float32Array) {
   }
   if (n === 0 || sum === 0) return 0
   return Math.exp(logSum / n) / (sum / n)
+}
+
+/** True signal amplitude, 0..1, from byte time-domain samples (128 = zero). */
+export function waveRms(wave: Uint8Array) {
+  let sum = 0
+  for (let i = 0; i < wave.length; i++) {
+    const x = (wave[i] - 128) / 128
+    sum += x * x
+  }
+  return Math.sqrt(sum / Math.max(1, wave.length))
+}
+
+/**
+ * How much of the signal to let through, 0..1. This is what stops the
+ * normalizer amplifying room noise to full scale when the music stops.
+ */
+export function audibility(level: number) {
+  return clamp01((level - audio.quietRms) / (audio.loudRms - audio.quietRms))
 }
 
 export function rms(mag: Float32Array) {

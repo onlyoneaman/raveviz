@@ -21,11 +21,15 @@ export const audio = {
 
   peakDecayS: 2.0,
   floorRiseS: 4.0,
-  normFloorGate: 1e-4,
-  // Absolute audibility floor. Without it the normalizer happily amplifies room
-  // noise to full scale the moment the music stops, and the visuals keep raging.
-  normQuietPeak: 6e-4,
-  normLoudPeak: 4e-3,
+  // Guards against a divide by zero only. Anything larger is another absolute
+  // FFT-magnitude constant, and it silently killed mid and air at low volume.
+  normFloorGate: 1e-7,
+  // Audibility is judged on time-domain RMS, which is a real 0..1 amplitude.
+  // Judging it on FFT magnitudes needs a different constant per band (the air
+  // band spreads its energy over ~300 bins, the sub over ~2), so a single
+  // threshold there silently gated the upper bands off at every volume.
+  quietRms: 0.003,
+  loudRms: 0.025,
 
   fluxWindow: 43,
   fluxThresholdMul: 3.0,
@@ -42,7 +46,7 @@ export const audio = {
   refractoryMs: [90, 60, 50, 45, 40],
   impulseDecayMs: 125,
 
-  silenceRms: 2e-3,
+  silenceLevel: 0.0015,
   silenceHoldS: 3,
   idleBpm: 145,
   idleDepth: 0.05,

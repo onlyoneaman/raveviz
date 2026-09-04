@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { AdaptiveNorm, BandSplitter, Envelopes, coeff, spectralFlatness } from '../src/audio/analyser'
+import {
+  AdaptiveNorm,
+  BandSplitter,
+  Envelopes,
+  audibility,
+  coeff,
+  spectralFlatness,
+  waveRms,
+} from '../src/audio/analyser'
 import { OnsetDetector } from '../src/audio/onset'
 import { BAND_COUNT, BASS, SUB, audio } from '../src/config'
 
@@ -81,30 +89,44 @@ describe('AdaptiveNorm', () => {
     expect(peak).toBeGreaterThan(0.9)
   })
 
-  // Room noise measured off a real MacBook mic sits at ~1e-4. Without an
-  // absolute floor the normalizer amplifies that to full scale and the visuals
-  // keep raging after the music stops.
-  test.each([
-    [1e-4, 0],
-    [6e-4, 0],
-  ])('stays dark at an inaudible amplitude %p', (amp: number, want: number) => {
-    const norm = new AdaptiveNorm()
-    const input = new Float32Array(BAND_COUNT)
-    const out = new Float32Array(BAND_COUNT)
-    let peak = 0
-    for (let i = 0; i < 600; i++) {
-      input.fill(amp * (0.5 + 0.5 * Math.sin(i * 0.3)))
-      norm.process(input, 1 / 60, out)
-      if (i > 250) peak = Math.max(peak, out[BASS])
-    }
-    expect(peak).toBe(want)
-  })
-
   test('stays in range and reports nothing on silence', () => {
     const norm = new AdaptiveNorm()
     const out = new Float32Array(BAND_COUNT)
     for (let i = 0; i < 300; i++) norm.process(new Float32Array(BAND_COUNT), 1 / 60, out)
     for (const v of out) expect(v).toBe(0)
+  })
+})
+
+describe('waveRms and audibility', () => {
+  const tone = (amp: number, n = 1024) =>
+    Uint8Array.from({ length: n }, (_, i) => 128 + Math.round(127 * amp * Math.sin(i * 0.2)))
+
+  test('reads back the amplitude it was given', () => {
+    // RMS of a sine is amplitude / sqrt(2).
+    expect(waveRms(tone(0.5))).toBeCloseTo(0.5 / Math.SQRT2, 2)
+  })
+
+  test('silence reads as zero', () => {
+    expect(waveRms(new Uint8Array(1024).fill(128))).toBe(0)
+  })
+
+  // Room noise off a real MacBook mic sits far below this. Without the gate the
+  // normalizer amplifies it to full scale and the visuals rage on in silence.
+  test('gates out room noise', () => {
+    expect(audibility(0.0005)).toBe(0)
+    expect(audibility(0.0015)).toBe(0)
+  })
+
+  // Measured: a comfortable listening level lands near 0.15 time-domain RMS.
+  // The old FFT-magnitude gate scored that at 0.15 and the visuals went dull.
+  test.each([0.05, 0.15, 0.5])('passes normal listening levels in full (%p)', (level: number) => {
+    expect(audibility(level)).toBe(1)
+  })
+
+  test('ramps rather than switching', () => {
+    const mid = audibility(0.014)
+    expect(mid).toBeGreaterThan(0.2)
+    expect(mid).toBeLessThan(0.8)
   })
 })
 

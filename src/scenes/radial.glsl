@@ -31,5 +31,5 @@ vec3 scene(vec2 uv) {
   float spoke = smoothstep(0.0, 0.06, min(within, 1.0 - within)) * step(outer, r);
   col += pal(0.2 + mag) * spoke * mag * mag * 0.5 * smoothstep(1.6, 0.5, r);
   col += pal(1.0) * exp(-9.0 * r) * uImpulse[BASS] * 1.5;
-  return col * (0.55 + 0.7 * uNorm[BASS]);
+  return col * (0.20 + 1.15 * uNorm[BASS]);
 }

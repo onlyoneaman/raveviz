@@ -12,6 +12,8 @@ export type AudioFrame = {
   events: number
 
   rms: number
+  /** Time-domain RMS amplitude, 0..1. The honest loudness measure. */
+  level: number
   centroid: number
   flatness: number
 
@@ -48,6 +50,7 @@ export function createFrame(): AudioFrame {
     impulse: new Float32Array(BAND_COUNT),
     events: 0,
     rms: 0,
+    level: 0,
     centroid: 0,
     flatness: 0,
     bpm: 0,
