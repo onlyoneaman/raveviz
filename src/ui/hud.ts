@@ -63,11 +63,15 @@ export class Hud {
     this.idleTimer += dt
     if (this.idleTimer > 3) this.root.classList.add('idle')
 
-    const bpm = f.bpm > 0 ? f.bpm.toFixed(1) : '--'
+    // Never print a tempo the tracker has not actually measured.
     const lock = f.confidence > 0.5 ? 'lock' : f.confidence > 0.2 ? 'soft' : 'free'
+    const tempo = f.silent
+      ? 'no signal'
+      : f.bpm > 0
+        ? `${f.bpm.toFixed(1)} bpm ${lock}`
+        : 'listening'
     this.status.textContent =
-      `${sceneName} · ${bpm} bpm ${lock} · bar ${f.bar % 4 | 0}` +
-      ` · ${fps.toFixed(0)}fps${f.silent ? ' · idle' : ''}${notes}`
+      `${sceneName} · ${tempo} · bar ${f.bar % 4 | 0} · ${fps.toFixed(0)}fps${notes}`
 
     for (let i = 0; i < this.meters.length; i++) {
       this.meters[i].style.transform = `scaleX(${f.norm[i].toFixed(3)})`

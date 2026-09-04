@@ -69,7 +69,13 @@ export class AdaptiveNorm {
       this.peak[b] = Math.max(v, this.peak[b] * peakKeep)
       this.floor[b] = Math.min(v, this.floor[b] + (v - this.floor[b]) * floorRise)
       const span = this.peak[b] - this.floor[b]
-      out[b] = span > audio.normFloorGate ? clamp01((v - this.floor[b]) / span) : 0
+      const scaled = span > audio.normFloorGate ? clamp01((v - this.floor[b]) / span) : 0
+      // Fade the whole band out when it is objectively quiet, not merely quiet
+      // relative to its own recent history.
+      const audible = clamp01(
+        (this.peak[b] - audio.normQuietPeak) / (audio.normLoudPeak - audio.normQuietPeak),
+      )
+      out[b] = scaled * audible
     }
     return out
   }

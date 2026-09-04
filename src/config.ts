@@ -17,6 +17,10 @@ export const audio = {
   peakDecayS: 2.0,
   floorRiseS: 4.0,
   normFloorGate: 1e-4,
+  // Absolute audibility floor. Without it the normalizer happily amplifies room
+  // noise to full scale the moment the music stops, and the visuals keep raging.
+  normQuietPeak: 6e-4,
+  normLoudPeak: 4e-3,
 
   fluxWindow: 43,
   fluxThresholdMul: 3.0,
@@ -36,6 +40,7 @@ export const audio = {
   silenceRms: 2e-3,
   silenceHoldS: 3,
   idleBpm: 145,
+  idleDepth: 0.12,
 }
 
 export const tempo = {

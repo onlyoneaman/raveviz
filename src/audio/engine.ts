@@ -1,4 +1,4 @@
-import { BAND_COUNT, BASS, MID, audio as cfg } from '../config'
+import { BAND_COUNT, BASS, audio as cfg } from '../config'
 import {
   AdaptiveNorm,
   BandSplitter,
@@ -116,19 +116,23 @@ export class AudioEngine {
     return f
   }
 
-  /** Never leave a dead screen: drive the scenes from a synthetic pulse. */
+  /**
+   * A slow ambient drift so the screen is not black, deliberately far below the
+   * level real audio produces. Silence must look like silence.
+   */
   private idle(f: AudioFrame, now: number) {
     const beat = (now * cfg.idleBpm) / 60
-    const pulse = Math.pow(1 - (beat % 1), 6)
+    const pulse = Math.pow(1 - (beat % 1), 8) * cfg.idleDepth
     for (let b = 0; b < BAND_COUNT; b++) {
       const wob = 0.5 + 0.5 * Math.sin(now * (0.3 + b * 0.17) + b)
-      f.norm[b] = 0.25 * wob + (b <= BASS ? 0.6 * pulse : 0.15 * pulse)
+      f.norm[b] = cfg.idleDepth * wob + (b <= BASS ? pulse : pulse * 0.3)
       f.impulse[b] = b <= BASS ? pulse : pulse * 0.4
     }
-    f.bpm = cfg.idleBpm
+    // Reported as unknown, not as a measurement. The HUD shows "idle".
+    f.bpm = 0
     f.confidence = 0
     f.centroid = 1200 + 400 * Math.sin(now * 0.2)
-    f.build = 0.5 + 0.5 * Math.sin(now * 0.05)
-    f.norm[MID] = Math.max(f.norm[MID], 0.3)
+    f.build = 0
+    f.drop = 0
   }
 }

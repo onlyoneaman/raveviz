@@ -67,7 +67,7 @@ describe('Envelopes', () => {
 describe('AdaptiveNorm', () => {
   // The whole point: identical response from a quiet laptop speaker and a hot
   // line input, four orders of magnitude apart.
-  test.each([1e-3, 1e-2, 1e-1, 1])('reaches full scale at amplitude %p', (amp: number) => {
+  test.each([4e-3, 1e-2, 1e-1, 1])('reaches full scale at amplitude %p', (amp: number) => {
     const norm = new AdaptiveNorm()
     const input = new Float32Array(BAND_COUNT)
     const out = new Float32Array(BAND_COUNT)
@@ -79,6 +79,25 @@ describe('AdaptiveNorm', () => {
       if (i > 200) peak = Math.max(peak, out[BASS])
     }
     expect(peak).toBeGreaterThan(0.9)
+  })
+
+  // Room noise measured off a real MacBook mic sits at ~1e-4. Without an
+  // absolute floor the normalizer amplifies that to full scale and the visuals
+  // keep raging after the music stops.
+  test.each([
+    [1e-4, 0],
+    [6e-4, 0],
+  ])('stays dark at an inaudible amplitude %p', (amp: number, want: number) => {
+    const norm = new AdaptiveNorm()
+    const input = new Float32Array(BAND_COUNT)
+    const out = new Float32Array(BAND_COUNT)
+    let peak = 0
+    for (let i = 0; i < 600; i++) {
+      input.fill(amp * (0.5 + 0.5 * Math.sin(i * 0.3)))
+      norm.process(input, 1 / 60, out)
+      if (i > 250) peak = Math.max(peak, out[BASS])
+    }
+    expect(peak).toBe(want)
   })
 
   test('stays in range and reports nothing on silence', () => {
