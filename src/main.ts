@@ -24,7 +24,7 @@ let blend = 1
 let blendS = camera.blendMinS
 let mode: TransitionMode = 'burn'
 const MODES: TransitionMode[] = ['fade', 'burn', 'burn', 'flash', 'cut']
-let autoCycle = show.autoCycle
+let locked = !show.autoCycle
 let hue = 0
 let trailBias = 1
 let lastPhrase = -1
@@ -118,12 +118,12 @@ addEventListener('keydown', (event) => {
   if (key === ' ') { jumpScene(); e.preventDefault() }
   else if (key >= '1' && key <= '9') setScene(Number(key) - 1)
   else if (key === '0') setScene(9)
-  else if (key === ',') setScene(sceneIndex - 1)
-  else if (key === '.') setScene(sceneIndex + 1)
+  else if (e.key === 'ArrowLeft') { setScene(sceneIndex - 1); e.preventDefault() }
+  else if (e.key === 'ArrowRight') { setScene(sceneIndex + 1); e.preventDefault() }
   else if (key === 'c') rollCamera()
   else if (key === 'f') document.fullscreenElement ? document.exitFullscreen() : canvas.requestFullscreen()
   else if (key === 'h') hud.root.classList.toggle('hidden')
-  else if (key === 'p') autoCycle = !autoCycle
+  else if (key === 'l') locked = !locked
   else if (key === 'd') engine.structure.fire()
   else if (key === 'b') engine.structure.enabled = !engine.structure.enabled
   else if (key === '[') trailBias = Math.max(0.6, trailBias - 0.04)
@@ -152,7 +152,7 @@ function loop(now: number) {
   // Cycling while nothing is playing makes the app look like it is inventing
   // structure. Hold the scene until there is a signal.
   if (frame.phrase !== lastPhrase) {
-    if (lastPhrase >= 0 && autoCycle && !frame.silent) jumpScene()
+    if (lastPhrase >= 0 && !locked && !frame.silent) jumpScene()
     lastPhrase = frame.phrase
   }
   hue += dt * 0.008
@@ -180,7 +180,7 @@ function loop(now: number) {
     mode,
   })
 
-  hud.update(frame, scene.name, fps, dt, notes)
+  hud.update(frame, scene.name, fps, dt, notes, locked)
   requestAnimationFrame(loop)
 }
 

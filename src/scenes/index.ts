@@ -5,6 +5,9 @@ import mandala from './mandala.glsl?raw'
 import girder from './girder.glsl?raw'
 import moire from './moire.glsl?raw'
 import beams from './beams.glsl?raw'
+import sunset from './sunset.glsl?raw'
+import discoball from './discoball.glsl?raw'
+import prism from './prism.glsl?raw'
 import kali from './kali.glsl?raw'
 import droste from './droste.glsl?raw'
 import metatron from './metatron.glsl?raw'
@@ -131,6 +134,29 @@ export const scenes: Scene[] = [
     camera: false,
     bloom: 0.7,
     accent: false,
+  },
+  {
+    name: 'sunset',
+    source: sunset,
+    palette: [hex('#FF7A18'), hex('#AF2896')],
+    resScale: 1.0,
+    feedback: { decay: 0.42, scale: 1.0, rotate: 0.0 },
+    camera: false,
+    accent: false,
+  },
+  {
+    name: 'discoball',
+    source: discoball,
+    palette: [hex('#FFD166'), hex('#06D6F0')],
+    resScale: 1.0,
+    feedback: { decay: 0.62, scale: 1.0, rotate: 0.0 },
+  },
+  {
+    name: 'prism',
+    source: prism,
+    palette: [hex('#FF4FD8'), hex('#35E8FF')],
+    resScale: 1.0,
+    feedback: { decay: 0.58, scale: 0.998, rotate: 0.002 },
   },
   {
     name: 'strobe',

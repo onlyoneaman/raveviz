@@ -19,10 +19,11 @@ from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "shots"
 URL = "http://localhost:5273/"
+# Walked with ArrowRight from scene 1, so this stays correct as scenes are added.
 SCENES = [
-    ("1", "wave"), ("2", "radial"), ("3", "vortex"), ("4", "droste"),
-    ("5", "mandala"), ("6", "metatron"), ("7", "kali"), ("8", "mandelbulb"),
-    ("9", "girder"),
+    "wave", "radial", "vortex", "droste", "mandala", "metatron", "kali",
+    "mandelbulb", "girder", "moire", "beams", "sunset", "discoball", "prism",
+    "strobe",
 ]
 SETTLE_MS = 2200
 
@@ -55,11 +56,13 @@ async def main() -> int:
         if info["err"] != 0:
             errors.append(f"glError {info['err']}")
 
-        await page.evaluate("() => dispatchEvent(new KeyboardEvent('keydown', {key:'p'}))")
-        for key, name in SCENES:
-            await page.evaluate(
-                f"() => dispatchEvent(new KeyboardEvent('keydown', {{key:'{key}'}}))"
-            )
+        await page.evaluate("() => dispatchEvent(new KeyboardEvent('keydown', {key:'l'}))")
+        await page.evaluate("() => dispatchEvent(new KeyboardEvent('keydown', {key:'1'}))")
+        for i, name in enumerate(SCENES):
+            if i:
+                await page.evaluate(
+                    "() => dispatchEvent(new KeyboardEvent('keydown', {key:'ArrowRight'}))"
+                )
             await page.wait_for_timeout(SETTLE_MS)
             data = await page.evaluate(
                 """() => new Promise(r => requestAnimationFrame(
@@ -83,10 +86,10 @@ async def main() -> int:
         print("\nok (install pillow for the contact sheet)")
         return 0
 
-    cols, cw, ch = 2, 640, 320
+    cols, cw, ch = 3, 640, 320
     rows = (len(SCENES) + cols - 1) // cols
     sheet = Image.new("RGB", (cols * cw, rows * ch), (0, 0, 0))
-    for i, (_, name) in enumerate(SCENES):
+    for i, name in enumerate(SCENES):
         sheet.paste(Image.open(OUT / f"{name}.png").resize((cw, ch)), ((i % cols) * cw, (i // cols) * ch))
     sheet.convert("RGB").save(OUT / "contact-sheet.jpg", quality=88, optimize=True)
     print("\nok, wrote shots/contact-sheet.jpg")

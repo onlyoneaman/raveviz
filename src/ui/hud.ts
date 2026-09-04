@@ -5,11 +5,11 @@ import type { AudioFrame } from '../audio/frame'
 const keyList = (sceneCount: number) => [
   ['space', 'jump scene'],
   [sceneCount > 10 ? '1-9 0' : `1-${sceneCount}`, 'pick scene'],
-  [', .', 'prev / next'],
+  ['← →', 'prev / next'],
   ['s', 'source'],
   ['f', 'fullscreen'],
   ['c', 're-roll camera'],
-  ['p', 'pause cycle'],
+  ['l', 'lock scene'],
   ['d', 'drop'],
   ['[ ]', 'trails'],
   ['b', 'build detect'],
@@ -80,7 +80,7 @@ export class Hud {
     this.root.classList.remove('idle')
   }
 
-  update(f: AudioFrame, sceneName: string, fps: number, dt: number, notes: string) {
+  update(f: AudioFrame, sceneName: string, fps: number, dt: number, notes: string, locked = false) {
     this.idleTimer += dt
     if (this.idleTimer > 3) this.root.classList.add('idle')
 
@@ -92,7 +92,8 @@ export class Hud {
         ? `${f.bpm.toFixed(1)} bpm ${lock}`
         : 'listening'
     this.status.textContent =
-      `${sceneName} · ${tempo} · bar ${f.bar % 4 | 0} · ${fps.toFixed(0)}fps${notes}`
+      `${sceneName}${locked ? ' [locked]' : ''} · ${tempo} · bar ${f.bar % 4 | 0}` +
+      ` · ${fps.toFixed(0)}fps${notes}`
 
     for (let i = 0; i < this.meters.length; i++) {
       this.meters[i].style.transform = `scaleX(${f.norm[i].toFixed(3)})`

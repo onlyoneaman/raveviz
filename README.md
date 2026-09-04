@@ -24,10 +24,10 @@ connected it runs on a synthetic 145 BPM drive, so the screen is never dead.
 |---|---|
 | `space` | jump to a random scene |
 | `1`-`9` `0` | pick scene (`1` is the raw waveform) |
-| `,` `.` | previous / next scene |
+| `←` `→` | previous / next scene |
 | `s` | cycle audio source |
 | `f` | fullscreen |
-| `p` | pause auto-cycle |
+| `l` | lock the current scene (stops auto-cycling) |
 | `d` | fire a drop manually |
 | `c` | re-roll the camera (spin direction, zoom target, accent colour) |
 | `b` | toggle build/drop detection |
