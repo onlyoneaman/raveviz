@@ -117,6 +117,10 @@ function loop(now: number) {
 refreshSources()
 requestAnimationFrame(loop)
 
+if (import.meta.env.DEV) {
+  Object.assign(window, { raveviz: { engine, get frame() { return engine.frame }, get scene() { return scenes[sceneIndex] } } })
+}
+
 if (import.meta.hot) {
   import.meta.hot.accept('./scenes/index.ts', (mod) => {
     if (!mod) return
