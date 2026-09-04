@@ -94,8 +94,11 @@ export class AudioEngine {
     f.centroid = spectralCentroid(this.bandMag, this.ctx.sampleRate, cfg.fftBands)
     f.flatness = spectralFlatness(this.bandMag)
 
+    // The hold stops a quiet passage of real audio flapping into idle. With no
+    // source connected there is nothing to flap, so do not make a fresh load
+    // sit dead for three seconds before anything moves.
     this.silentFor = f.rms < cfg.silenceRms ? this.silentFor + dt : 0
-    f.silent = this.silentFor > cfg.silenceHoldS
+    f.silent = this.source === null || this.silentFor > cfg.silenceHoldS
 
     this.splitter.split(this.bandMag, this.raw)
     this.envelopes.process(this.raw, dt, f.bands)

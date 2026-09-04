@@ -95,6 +95,7 @@ export class Pipeline {
     this.history = [createTarget(gl, 1, 1), createTarget(gl, 1, 1)]
   }
 
+
   /** 1D R8 lookup table for per-frame audio data. */
   private makeDataTexture(width: number): WebGLTexture {
     const gl = this.gl
