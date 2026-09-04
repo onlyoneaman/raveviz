@@ -20,6 +20,11 @@ export type AudioFrame = {
   build: number
   drop: number
 
+  /** 0..1 overall audible level. Drives global brightness and time advance. */
+  energy: number
+  /** Wall clock scaled by energy, so the image nearly freezes in silence. */
+  visualTime: number
+
   silent: boolean
   dt: number
   time: number
@@ -42,6 +47,8 @@ export function createFrame(): AudioFrame {
     confidence: 0,
     build: 0,
     drop: 0,
+    energy: 0,
+    visualTime: 0,
     silent: true,
     dt: 0,
     time: 0,

@@ -13,6 +13,7 @@ uniform float uPhrase;
 uniform float uConf;
 uniform float uBuild;
 uniform float uDrop;
+uniform float uEnergy;
 uniform float uHue;
 uniform vec3  uPalA;
 uniform vec3  uPalB;

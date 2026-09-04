@@ -97,8 +97,10 @@ function loop(now: number) {
 
   const frame = engine.tick(dt, clock)
 
+  // Cycling while nothing is playing makes the app look like it is inventing
+  // structure. Hold the scene until there is a signal.
   if (frame.phrase !== lastPhrase) {
-    if (lastPhrase >= 0 && autoCycle) setScene(sceneIndex + 1)
+    if (lastPhrase >= 0 && autoCycle && !frame.silent) setScene(sceneIndex + 1)
     lastPhrase = frame.phrase
   }
   hue += dt * 0.008

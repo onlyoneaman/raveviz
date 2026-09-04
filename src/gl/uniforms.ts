@@ -12,7 +12,8 @@ export function uploadAudio(
   hue: number,
 ) {
   u.v2('uRes', width, height)
-  u.f('uTime', f.time)
+  u.f('uTime', f.visualTime)
+  u.f('uEnergy', f.energy)
   u.fv('uNorm', f.norm)
   u.fv('uImpulse', f.impulse)
   u.f('uRms', f.rms)

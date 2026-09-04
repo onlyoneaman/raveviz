@@ -1,6 +1,7 @@
-import { BAND_COUNT, BASS, audio as cfg } from '../config'
+import { BAND_COUNT, BASS, audio as cfg, visual } from '../config'
 import {
   AdaptiveNorm,
+  coeff,
   BandSplitter,
   Envelopes,
   dbToLinear,
@@ -40,6 +41,8 @@ export class AudioEngine {
 
   source: Source | null = null
   private silentFor = 0
+  private energy = 0
+  private visualClock = 0
 
   constructor() {
     this.ctx = new AudioContext({ latencyHint: 'interactive' })
@@ -113,6 +116,17 @@ export class AudioEngine {
     f.drop = this.structure.drop
 
     if (f.silent) this.idle(f, now)
+
+    let loudest = 0
+    for (let b = 0; b < BAND_COUNT; b++) loudest = Math.max(loudest, f.norm[b])
+    const rising = loudest > this.energy
+    this.energy +=
+      (loudest - this.energy) * coeff(rising ? visual.energyAttackMs : visual.energyReleaseMs, dt)
+    f.energy = this.energy
+
+    this.visualClock += dt * (visual.idleTimeScale + (1 - visual.idleTimeScale) * this.energy)
+    f.visualTime = this.visualClock
+
     return f
   }
 

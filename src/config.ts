@@ -40,7 +40,7 @@ export const audio = {
   silenceRms: 2e-3,
   silenceHoldS: 3,
   idleBpm: 145,
-  idleDepth: 0.12,
+  idleDepth: 0.10,
 }
 
 export const tempo = {
@@ -61,6 +61,16 @@ export const structure = {
   dropLookbackS: 8,
   dropSubRatio: 0.85,
   dropDecayMs: 900,
+}
+
+export const visual = {
+  // With no audio the scenes still animated on wall-clock time and rendered at
+  // 30-50% brightness, so silence looked identical to music. Motion and
+  // brightness are now driven by the signal itself.
+  idleTimeScale: 0.12,
+  idleDim: 0.10,
+  energyAttackMs: 60,
+  energyReleaseMs: 400,
 }
 
 export const render = {
