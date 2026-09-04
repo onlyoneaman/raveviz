@@ -18,6 +18,7 @@ export class Hud {
   private readonly status = document.createElement('div')
   private readonly meters: HTMLDivElement[] = []
   private readonly sources = document.createElement('div')
+  private readonly toast = document.createElement('div')
   private idleTimer = 0
 
   constructor() {
@@ -26,6 +27,7 @@ export class Hud {
       <div class="hud-row"><span class="brand">raveviz</span><span class="stat"></span></div>
       <div class="meters"></div>
       <div class="sources"></div>
+      <div class="toast" hidden></div>
       <div class="keys">${KEYS.map(([k, v]) => `<span><b>${k}</b>${v}</span>`).join('')}</div>`
 
     this.status = this.root.querySelector('.stat')!
@@ -38,6 +40,7 @@ export class Hud {
       this.meters.push(bar.firstElementChild as HTMLDivElement)
     }
     this.sources = this.root.querySelector('.sources')!
+    this.toast = this.root.querySelector('.toast')!
 
     addEventListener('mousemove', () => this.wake())
     this.wake()
@@ -52,6 +55,13 @@ export class Hud {
       el.onclick = () => b.onPick()
       this.sources.appendChild(el)
     }
+  }
+
+  /** Capture failures are the one thing that must not auto-hide. */
+  say(message: string) {
+    this.toast.textContent = message
+    this.toast.hidden = !message
+    if (message) this.wake()
   }
 
   wake() {

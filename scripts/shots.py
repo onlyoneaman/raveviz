@@ -19,7 +19,10 @@ from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "shots"
 URL = "http://localhost:5273/"
-SCENES = [("1", "kali"), ("2", "droste"), ("3", "metatron"), ("4", "mandelbulb"), ("5", "strobe")]
+SCENES = [
+    ("1", "wave"), ("2", "radial"), ("3", "vortex"), ("4", "kali"),
+    ("5", "droste"), ("6", "metatron"), ("7", "mandelbulb"), ("8", "strobe"),
+]
 SETTLE_MS = 2200
 
 
@@ -79,9 +82,11 @@ async def main() -> int:
         print("\nok (install pillow for the contact sheet)")
         return 0
 
-    sheet = Image.new("RGB", (1280, 960), (0, 0, 0))
+    cols, cw, ch = 2, 640, 320
+    rows = (len(SCENES) + cols - 1) // cols
+    sheet = Image.new("RGB", (cols * cw, rows * ch), (0, 0, 0))
     for i, (_, name) in enumerate(SCENES):
-        sheet.paste(Image.open(OUT / f"{name}.png").resize((640, 320)), ((i % 2) * 640, (i // 2) * 320))
+        sheet.paste(Image.open(OUT / f"{name}.png").resize((cw, ch)), ((i % cols) * cw, (i // cols) * ch))
     sheet.convert("RGB").save(OUT / "contact-sheet.jpg", quality=88, optimize=True)
     print("\nok, wrote shots/contact-sheet.jpg")
     return 0

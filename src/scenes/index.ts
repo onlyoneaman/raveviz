@@ -1,4 +1,6 @@
 import wave from './wave.glsl?raw'
+import radial from './radial.glsl?raw'
+import vortex from './vortex.glsl?raw'
 import kali from './kali.glsl?raw'
 import droste from './droste.glsl?raw'
 import metatron from './metatron.glsl?raw'
@@ -32,6 +34,20 @@ export const scenes: Scene[] = [
     palette: [hex('#00E5FF'), hex('#9FFF00')],
     resScale: 1.0,
     feedback: { decay: 0.34, scale: 1.0, rotate: 0.0 },
+  },
+  {
+    name: 'radial',
+    source: radial,
+    palette: [hex('#00E5FF'), hex('#FF2D95')],
+    resScale: 1.0,
+    feedback: { decay: 0.55, scale: 1.0, rotate: 0.0 },
+  },
+  {
+    name: 'vortex',
+    source: vortex,
+    palette: [hex('#FF2D95'), hex('#7B2CFF')],
+    resScale: 1.0,
+    feedback: { decay: 0.86, scale: 0.985, rotate: 0.006 },
   },
   {
     name: 'kali',

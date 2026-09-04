@@ -52,12 +52,21 @@ export async function openSystem(ctx: AudioContext): Promise<Source> {
     systemAudio: 'include',
   } as DisplayMediaStreamOptions)
 
+  // 'monitor' | 'window' | 'browser'. Chrome never offers audio for a window,
+  // and the audio checkbox is off by default on the other two.
+  const surface = stream.getVideoTracks()[0]?.getSettings().displaySurface
   for (const track of stream.getVideoTracks()) {
     track.stop()
     stream.removeTrack(track)
   }
   if (stream.getAudioTracks().length === 0) {
-    throw new Error('No audio track. Tick "Share audio" in the picker.')
+    throw new Error(
+      surface === 'window'
+        ? 'Window sharing carries no audio in Chrome, ever. Share again and pick "Chrome Tab" (tick "Also share tab audio") or "Entire Screen" (tick "Share system audio").'
+        : surface === 'browser'
+          ? 'No audio: "Also share tab audio" was not ticked. It is off by default, bottom-left of the picker.'
+          : 'No audio: "Share system audio" was not ticked. It is off by default, bottom-left of the picker. Chrome also needs Screen & System Audio Recording permission in System Settings > Privacy & Security.',
+    )
   }
   return attach(ctx, stream, 'system', stream.getAudioTracks()[0].label || 'system audio')
 }

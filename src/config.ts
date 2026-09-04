@@ -8,6 +8,7 @@ export const MID = 3
 export const AIR = 4
 
 export const WAVE_SIZE = 1024
+export const SPECTRUM_SIZE = 2048
 
 export const audio = {
   fftBands: 4096,

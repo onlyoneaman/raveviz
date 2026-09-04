@@ -18,9 +18,17 @@ uniform float uHue;
 uniform vec3  uPalA;
 uniform vec3  uPalB;
 uniform sampler2D uWave;
+uniform sampler2D uSpectrum;
+uniform float uNyquist;
 
 /** Time-domain sample at x in 0..1, returned in -1..1. */
 float waveAt(float x) { return texture(uWave, vec2(clamp(x, 0.0, 1.0), 0.5)).r * 2.0 - 1.0; }
+
+/** Magnitude 0..1 at x in 0..1, log-spaced across 20Hz to 16kHz. */
+float specAt(float x) {
+  float hz = 20.0 * pow(800.0, clamp(x, 0.0, 1.0));
+  return texture(uSpectrum, vec2(hz / uNyquist, 0.5)).r;
+}
 
 #define SUB   0
 #define BASS  1

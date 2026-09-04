@@ -83,6 +83,8 @@ export class AudioEngine {
     f.time = now
 
     this.onsetNode.getByteTimeDomainData(f.wave)
+    this.bandNode.getByteFrequencyData(f.spectrum)
+    f.nyquist = this.ctx.sampleRate * 0.5
     this.bandNode.getFloatFrequencyData(this.bandDb)
     this.onsetNode.getFloatFrequencyData(this.onsetDb)
     dbToLinear(this.bandDb, this.bandMag)

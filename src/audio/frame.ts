@@ -1,8 +1,11 @@
-import { BAND_COUNT, WAVE_SIZE } from '../config'
+import { BAND_COUNT, SPECTRUM_SIZE, WAVE_SIZE } from '../config'
 
 export type AudioFrame = {
   /** Raw time-domain samples, 128 = zero. Never gated: this is literal input. */
   wave: Uint8Array<ArrayBuffer>
+  /** Byte FFT magnitudes, linear in frequency. Shaders log-map it. */
+  spectrum: Uint8Array<ArrayBuffer>
+  nyquist: number
   bands: Float32Array
   norm: Float32Array
   impulse: Float32Array
@@ -35,6 +38,8 @@ export type AudioFrame = {
 export function createFrame(): AudioFrame {
   return {
     wave: new Uint8Array(WAVE_SIZE).fill(128),
+    spectrum: new Uint8Array(SPECTRUM_SIZE),
+    nyquist: 24000,
     bands: new Float32Array(BAND_COUNT),
     norm: new Float32Array(BAND_COUNT),
     impulse: new Float32Array(BAND_COUNT),

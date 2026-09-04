@@ -35,8 +35,12 @@ async function pick(open: () => Promise<Awaited<ReturnType<typeof openMic>>>) {
     await engine.connect(await open())
     notes = ''
   } catch (err) {
-    notes = ` · ${(err as Error).message}`
+    const message = (err as Error).message
+    hud.say(message.includes('Permission') || message.includes('denied') ? 'Permission denied.' : message)
+    refreshSources()
+    return
   }
+  hud.say('')
   refreshSources()
 }
 

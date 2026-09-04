@@ -23,7 +23,7 @@ connected it runs on a synthetic 145 BPM drive, so the screen is never dead.
 | key | |
 |---|---|
 | `space` | next scene |
-| `1`-`6` | pick scene (`1` is the raw waveform) |
+| `1`-`8` | pick scene (`1` is the raw waveform) |
 | `S` | cycle audio source |
 | `F` | fullscreen |
 | `P` | pause auto-cycle |
@@ -41,6 +41,10 @@ beats make a phrase. Nothing else hardcodes a constant.
 
 **A scene's look:** `src/scenes/<name>.glsl`. Each is a single self-contained
 `vec3 scene(vec2 uv)`. Save the file and it hot-reloads into the running page.
+
+Shaders can read the live audio directly: `waveAt(x)` for time-domain samples
+and `specAt(x)` for a log-spaced spectrum magnitude, both taking x in 0..1.
+That is how the circular scenes bend frequency around a ring.
 
 **Adding a scene:** drop a `.glsl` next to the others and add one entry to
 `src/scenes/index.ts` with its palette, resolution scale and feedback settings.
