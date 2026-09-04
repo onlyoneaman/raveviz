@@ -61,20 +61,6 @@ export const scenes: Scene[] = [
     feedback: { decay: 0.86, scale: 0.985, rotate: 0.006 },
   },
   {
-    name: 'mandala',
-    source: mandala,
-    palette: [hex('#B026FF'), hex('#39FF14')],
-    resScale: 1.0,
-    feedback: { decay: 0.74, scale: 0.997, rotate: 0.004 },
-  },
-  {
-    name: 'kali',
-    source: kali,
-    palette: [hex('#7B2CFF'), hex('#9FFF00')],
-    resScale: 1.0,
-    feedback: { decay: 0.8, scale: 0.995, rotate: 0.002 },
-  },
-  {
     name: 'droste',
     source: droste,
     palette: [hex('#00E5FF'), hex('#FF00A8')],
@@ -82,11 +68,25 @@ export const scenes: Scene[] = [
     feedback: { decay: 0.93, scale: 0.965, rotate: 0.02 },
   },
   {
+    name: 'mandala',
+    source: mandala,
+    palette: [hex('#B026FF'), hex('#39FF14')],
+    resScale: 1.0,
+    feedback: { decay: 0.74, scale: 0.997, rotate: 0.004 },
+  },
+  {
     name: 'metatron',
     source: metatron,
     palette: [hex('#FF6A00'), hex('#FFD84D')],
     resScale: 1.0,
     feedback: { decay: 0.72, scale: 1.0, rotate: 0.0 },
+  },
+  {
+    name: 'kali',
+    source: kali,
+    palette: [hex('#7B2CFF'), hex('#9FFF00')],
+    resScale: 1.0,
+    feedback: { decay: 0.8, scale: 0.995, rotate: 0.002 },
   },
   {
     name: 'mandelbulb',

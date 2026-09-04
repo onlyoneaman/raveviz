@@ -5,6 +5,7 @@ import { ResolutionGovernor } from './gl/governor'
 import { Pipeline } from './gl/pipeline'
 import { pickAccent, scenes as initialScenes, type Scene } from './scenes'
 import { camera, show } from './config'
+import type { TransitionMode } from './gl/pipeline'
 import { Hud } from './ui/hud'
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement
@@ -20,6 +21,9 @@ document.body.appendChild(hud.root)
 let sceneIndex = 0
 let fromIndex: number | null = null
 let blend = 1
+let blendS = camera.blendMinS
+let mode: TransitionMode = 'burn'
+const MODES: TransitionMode[] = ['fade', 'burn', 'burn', 'flash']
 let autoCycle = show.autoCycle
 let hue = 0
 let trailBias = 1
@@ -40,6 +44,8 @@ function setScene(next: number) {
   if (target === sceneIndex) return
   fromIndex = sceneIndex
   blend = 0
+  blendS = camera.blendMinS + Math.random() * (camera.blendMaxS - camera.blendMinS)
+  mode = MODES[Math.floor(Math.random() * MODES.length)]
   sceneIndex = target
   hue += 0.25
   rollCamera()
@@ -145,7 +151,7 @@ function loop(now: number) {
   }
   hue += dt * 0.008
 
-  blend = Math.min(1, blend + dt / camera.blendS)
+  blend = Math.min(1, blend + dt / blendS)
   if (blend >= 1) fromIndex = null
 
   // Spin and zoom advance on the audio clock, so they stall with everything
@@ -165,12 +171,14 @@ function loop(now: number) {
     accent,
     from: fromIndex !== null ? { scene: scenes[fromIndex], index: fromIndex } : null,
     blend,
+    mode,
   })
 
   hud.update(frame, scene.name, fps, dt, notes)
   requestAnimationFrame(loop)
 }
 
+hud.setKeys(scenes.length)
 refreshSources()
 requestAnimationFrame(loop)
 

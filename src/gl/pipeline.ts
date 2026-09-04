@@ -32,6 +32,13 @@ const frag = (body: string, sceneMain: boolean) =>
 
 type Pass = { program: WebGLProgram; uniforms: Uniforms }
 
+/**
+ * How two scenes are mixed mid-transition. All three composite additively onto
+ * a cleared buffer, which suits glow-heavy scenes far better than an alpha
+ * crossfade, where the midpoint goes muddy instead of hot.
+ */
+export type TransitionMode = 'fade' | 'burn' | 'flash'
+
 export type RenderOptions = {
   hue: number
   trailBias: number
@@ -39,6 +46,19 @@ export type RenderOptions = {
   /** Scene being faded out, and how far the fade has got. 1 means done. */
   from: { scene: Scene; index: number } | null
   blend: number
+  mode: TransitionMode
+}
+
+/** Weights for the outgoing and incoming scene. Summing above 1 mid-fade is
+ *  the point: the overlap blooms rather than dipping. */
+function mixWeights(mode: TransitionMode, b: number): [number, number] {
+  const s = b * b * (3 - 2 * b)
+  if (mode === 'fade') return [1 - s, s]
+  const out = Math.sqrt(1 - b)
+  const inn = Math.sqrt(b)
+  if (mode === 'burn') return [out, inn]
+  const spike = 1 + 0.9 * Math.sin(Math.PI * b)
+  return [out * spike, inn * spike]
 }
 
 /**
@@ -131,16 +151,21 @@ export class Pipeline {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.sceneTarget.fbo)
     gl.viewport(0, 0, this.sceneTarget.width, this.sceneTarget.height)
 
-    // Crossfade: draw the outgoing scene, then the incoming one over it with a
-    // constant alpha. Only costs a second scene pass while a fade is running.
+    // The second scene pass only runs while a transition is in flight.
     if (opts.from && opts.blend < 1) {
-      this.drawScene(opts.from.index, frame, opts.from.scene, opts)
+      const [outW, inW] = mixWeights(opts.mode, opts.blend)
+      gl.clearColor(0, 0, 0, 1)
+      gl.clear(gl.COLOR_BUFFER_BIT)
       gl.enable(gl.BLEND)
-      gl.blendColor(0, 0, 0, opts.blend)
-      gl.blendFunc(gl.CONSTANT_ALPHA, gl.ONE_MINUS_CONSTANT_ALPHA)
+      gl.blendFunc(gl.CONSTANT_ALPHA, gl.ONE)
+      gl.blendColor(0, 0, 0, outW)
+      this.drawScene(opts.from.index, frame, opts.from.scene, opts)
+      gl.blendColor(0, 0, 0, inW)
+      this.drawScene(index, frame, scene, opts)
+      gl.disable(gl.BLEND)
+    } else {
+      this.drawScene(index, frame, scene, opts)
     }
-    this.drawScene(index, frame, scene, opts)
-    gl.disable(gl.BLEND)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, next.fbo)
     gl.viewport(0, 0, this.width, this.height)

@@ -23,9 +23,11 @@
       .brand { color: var(--acid); font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
       .stat { color: var(--dim); }
 
-      .meters { display: flex; gap: 4px; margin: 8px 0; }
-      .meter { width: 46px; height: 3px; background: #ffffff1c; overflow: hidden; }
-      .meter i { display: block; height: 100%; background: var(--acid); transform-origin: left; transform: scaleX(0); }
+      .meters { display: flex; gap: 8px; margin: 8px 0 10px; }
+      .meter { width: 52px; }
+      .meter > i { display: block; height: 3px; background: var(--acid); transform-origin: left; transform: scaleX(0); }
+      .meter { background: linear-gradient(#ffffff1c, #ffffff1c) top left / 100% 3px no-repeat; }
+      .meter label { display: block; margin-top: 4px; font-size: 10px; letter-spacing: .09em; color: #4d5a63; }
 
       .sources { display: flex; gap: 6px; margin-bottom: 8px; pointer-events: auto; }
       .sources button {

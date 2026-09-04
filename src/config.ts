@@ -1,6 +1,8 @@
 export const BAND_EDGES_HZ = [20, 60, 150, 800, 3000, 16000]
 export const BAND_COUNT = BAND_EDGES_HZ.length - 1
 
+export const BAND_NAMES = ['sub', 'bass', 'low', 'mid', 'air']
+
 export const SUB = 0
 export const BASS = 1
 export const LOMID = 2
@@ -94,8 +96,9 @@ export const render = {
 }
 
 export const camera = {
-  /** Seconds to crossfade between scenes. */
-  blendS: 1.6,
+  /** Crossfade length, drawn fresh per transition so cuts do not feel metronomic. */
+  blendMinS: 0.7,
+  blendMaxS: 2.4,
   /** Per-phrase spin rate is drawn from this range, sign included. */
   spinMin: 0.02,
   spinMax: 0.20,

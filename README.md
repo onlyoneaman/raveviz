@@ -24,14 +24,18 @@ connected it runs on a synthetic 145 BPM drive, so the screen is never dead.
 |---|---|
 | `space` | jump to a random scene |
 | `1`-`9` | pick scene (`1` is the raw waveform) |
-| `S` | cycle audio source |
-| `F` | fullscreen |
-| `P` | pause auto-cycle |
-| `D` | fire a drop manually |
-| `C` | re-roll the camera (spin direction, zoom target, accent colour) |
-| `B` | toggle build/drop detection |
+| `s` | cycle audio source |
+| `f` | fullscreen |
+| `p` | pause auto-cycle |
+| `d` | fire a drop manually |
+| `c` | re-roll the camera (spin direction, zoom target, accent colour) |
+| `b` | toggle build/drop detection |
 | `[` `]` | shorter / longer trails |
-| `H` | hide the HUD |
+
+All plain keypresses, no modifiers. The five meters are the analysis bands:
+`sub` 20-60Hz, `bass` 60-150, `low` 150-800, `mid` 800-3k (where vocals sit),
+`air` 3k-16k.
+| `h` | hide the HUD |
 
 ## Where to change things
 
