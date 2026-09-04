@@ -22,12 +22,13 @@ connected it runs on a synthetic 145 BPM drive, so the screen is never dead.
 
 | key | |
 |---|---|
-| `space` | next scene |
-| `1`-`8` | pick scene (`1` is the raw waveform) |
+| `space` | jump to a random scene |
+| `1`-`9` | pick scene (`1` is the raw waveform) |
 | `S` | cycle audio source |
 | `F` | fullscreen |
 | `P` | pause auto-cycle |
 | `D` | fire a drop manually |
+| `C` | re-roll the camera (spin direction, zoom target, accent colour) |
 | `B` | toggle build/drop detection |
 | `[` `]` | shorter / longer trails |
 | `H` | hide the HUD |

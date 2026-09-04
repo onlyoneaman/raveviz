@@ -3,8 +3,8 @@ import { isLoopback, listInputs, openMic, openSystem } from './audio/source'
 import { createContext } from './gl/context'
 import { ResolutionGovernor } from './gl/governor'
 import { Pipeline } from './gl/pipeline'
-import { scenes as initialScenes, type Scene } from './scenes'
-import { show } from './config'
+import { pickAccent, scenes as initialScenes, type Scene } from './scenes'
+import { camera, show } from './config'
 import { Hud } from './ui/hud'
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement
@@ -18,16 +18,46 @@ const hud = new Hud()
 document.body.appendChild(hud.root)
 
 let sceneIndex = 0
+let fromIndex: number | null = null
+let blend = 1
 let autoCycle = show.autoCycle
 let hue = 0
 let trailBias = 1
 let lastPhrase = -1
 let fps = 60
 let notes = ''
+let accent = pickAccent(initialScenes, 0.3)
+
+// Camera state, re-rolled each phrase so the motion keeps changing character
+// instead of always being the same slow push-in.
+let spin = 0.05
+let spinRate = 0.05
+let zoom = 1
+let zoomTarget = 1
 
 function setScene(next: number) {
-  sceneIndex = ((next % scenes.length) + scenes.length) % scenes.length
+  const target = ((next % scenes.length) + scenes.length) % scenes.length
+  if (target === sceneIndex) return
+  fromIndex = sceneIndex
+  blend = 0
+  sceneIndex = target
   hue += 0.25
+  rollCamera()
+}
+
+/** Jump somewhere else in the set rather than stepping through it in order. */
+function jumpScene() {
+  if (scenes.length < 2) return
+  let next = sceneIndex
+  while (next === sceneIndex) next = Math.floor(Math.random() * scenes.length)
+  setScene(next)
+}
+
+function rollCamera() {
+  const dir = Math.random() < 0.5 ? -1 : 1
+  spinRate = dir * (camera.spinMin + Math.random() * (camera.spinMax - camera.spinMin))
+  zoomTarget = camera.zoomMin + Math.random() * (camera.zoomMax - camera.zoomMin)
+  accent = pickAccent(scenes, Math.random())
 }
 
 async function pick(open: () => Promise<Awaited<ReturnType<typeof openMic>>>) {
@@ -76,8 +106,9 @@ addEventListener('keydown', (event) => {
   const e = event as KeyboardEvent
   hud.wake()
   const key = e.key.toLowerCase()
-  if (key === ' ') { setScene(sceneIndex + 1); e.preventDefault() }
+  if (key === ' ') { jumpScene(); e.preventDefault() }
   else if (key >= '1' && key <= '9') setScene(Number(key) - 1)
+  else if (key === 'c') rollCamera()
   else if (key === 'f') document.fullscreenElement ? document.exitFullscreen() : canvas.requestFullscreen()
   else if (key === 'h') hud.root.classList.toggle('hidden')
   else if (key === 'p') autoCycle = !autoCycle
@@ -109,15 +140,32 @@ function loop(now: number) {
   // Cycling while nothing is playing makes the app look like it is inventing
   // structure. Hold the scene until there is a signal.
   if (frame.phrase !== lastPhrase) {
-    if (lastPhrase >= 0 && autoCycle && !frame.silent) setScene(sceneIndex + 1)
+    if (lastPhrase >= 0 && autoCycle && !frame.silent) jumpScene()
     lastPhrase = frame.phrase
   }
   hue += dt * 0.008
 
+  blend = Math.min(1, blend + dt / camera.blendS)
+  if (blend >= 1) fromIndex = null
+
+  // Spin and zoom advance on the audio clock, so they stall with everything
+  // else when nothing is playing.
+  const beat = frame.impulse[1]
+  spin += frame.dt * (spinRate + camera.kickSpin * beat) * (0.15 + 0.85 * frame.energy)
+  zoom += (zoomTarget - zoom) * (1 - Math.exp(-dt / camera.zoomRateS))
+  frame.camSpin = spin
+  frame.camZoom = zoom * (1 - camera.kickZoom * beat)
+
   const scene = scenes[sceneIndex]
   const scale = governor.update(performance.now() - frameStart, dt, scene.resScale)
   pipeline.resize(canvas.width, canvas.height, scale)
-  pipeline.render(frame, scene, sceneIndex, { hue, trailBias })
+  pipeline.render(frame, scene, sceneIndex, {
+    hue,
+    trailBias,
+    accent,
+    from: fromIndex !== null ? { scene: scenes[fromIndex], index: fromIndex } : null,
+    blend,
+  })
 
   hud.update(frame, scene.name, fps, dt, notes)
   requestAnimationFrame(loop)

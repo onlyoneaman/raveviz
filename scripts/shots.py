@@ -20,8 +20,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "shots"
 URL = "http://localhost:5273/"
 SCENES = [
-    ("1", "wave"), ("2", "radial"), ("3", "vortex"), ("4", "kali"),
-    ("5", "droste"), ("6", "metatron"), ("7", "mandelbulb"), ("8", "strobe"),
+    ("1", "wave"), ("2", "radial"), ("3", "vortex"), ("4", "mandala"),
+    ("5", "kali"), ("6", "droste"), ("7", "metatron"), ("8", "mandelbulb"),
+    ("9", "strobe"),
 ]
 SETTLE_MS = 2200
 

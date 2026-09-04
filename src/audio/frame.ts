@@ -27,6 +27,9 @@ export type AudioFrame = {
 
   /** 0..1 overall audible level. Drives global brightness and time advance. */
   energy: number
+  /** Global camera, re-rolled each phrase so motion keeps changing character. */
+  camSpin: number
+  camZoom: number
   /** Wall clock scaled by energy, so the image nearly freezes in silence. */
   visualTime: number
 
@@ -56,6 +59,8 @@ export function createFrame(): AudioFrame {
     build: 0,
     drop: 0,
     energy: 0,
+    camSpin: 0,
+    camZoom: 1,
     visualTime: 0,
     silent: true,
     dt: 0,

@@ -93,6 +93,21 @@ export const render = {
   governorStep: 0.1,
 }
 
+export const camera = {
+  /** Seconds to crossfade between scenes. */
+  blendS: 1.6,
+  /** Per-phrase spin rate is drawn from this range, sign included. */
+  spinMin: 0.02,
+  spinMax: 0.20,
+  /** Zoom drifts in or out between these, so motion is not always a push-in. */
+  zoomMin: 0.72,
+  zoomMax: 1.45,
+  zoomRateS: 26,
+  /** Extra spin and zoom the kick adds on top. */
+  kickSpin: 0.05,
+  kickZoom: 0.10,
+}
+
 export const show = {
   phrasesPerScene: 1,
   autoCycle: true,

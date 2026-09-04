@@ -17,6 +17,9 @@ uniform float uEnergy;
 uniform float uHue;
 uniform vec3  uPalA;
 uniform vec3  uPalB;
+uniform vec3  uPalC;
+uniform float uCamSpin;
+uniform float uCamZoom;
 uniform sampler2D uWave;
 uniform sampler2D uSpectrum;
 uniform float uNyquist;
@@ -38,9 +41,16 @@ float specAt(float x) {
 #define MID   3
 #define AIR   4
 
-/** Scene palette ramp with the global hue offset applied. */
+/**
+ * Three-stop ramp. The third stop is borrowed from another scene's palette and
+ * re-rolled each phrase, so colours keep mixing instead of sitting on one axis.
+ */
 vec3 pal(float t) {
-  return hueRotate(mix(uPalA, uPalB, smoothstep(0.0, 1.0, clamp(t, 0.0, 1.0))), uHue);
+  t = clamp(t, 0.0, 1.0);
+  vec3 c = t < 0.5
+    ? mix(uPalA, uPalB, smoothstep(0.0, 1.0, t * 2.0))
+    : mix(uPalB, uPalC, smoothstep(0.0, 1.0, t * 2.0 - 1.0));
+  return hueRotate(c, uHue);
 }
 
 /** 1.0 on the beat, falling away. Higher `sharp` is a tighter spike. */

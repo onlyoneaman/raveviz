@@ -11,6 +11,7 @@ export function uploadAudio(
   height: number,
   scene: Scene,
   hue: number,
+  accent: readonly [number, number, number],
 ) {
   u.v2('uRes', width, height)
   u.f('uTime', f.visualTime)
@@ -34,4 +35,8 @@ export function uploadAudio(
   u.f('uHue', hue)
   u.v3('uPalA', scene.palette[0][0], scene.palette[0][1], scene.palette[0][2])
   u.v3('uPalB', scene.palette[1][0], scene.palette[1][1], scene.palette[1][2])
+  u.v3('uPalC', accent[0], accent[1], accent[2])
+  const moves = scene.camera !== false
+  u.f('uCamSpin', moves ? f.camSpin : 0)
+  u.f('uCamZoom', moves ? f.camZoom : 1)
 }

@@ -23,6 +23,7 @@ out vec4 fragColor;
 const SCENE_MAIN = `
 void main() {
   vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;
+  uv = rot2(uCamSpin) * uv * uCamZoom;
   fragColor = vec4(scene(uv), 1.0);
 }`
 
@@ -31,7 +32,14 @@ const frag = (body: string, sceneMain: boolean) =>
 
 type Pass = { program: WebGLProgram; uniforms: Uniforms }
 
-export type RenderOptions = { hue: number; trailBias: number }
+export type RenderOptions = {
+  hue: number
+  trailBias: number
+  accent: readonly [number, number, number]
+  /** Scene being faded out, and how far the fade has got. 1 means done. */
+  from: { scene: Scene; index: number } | null
+  blend: number
+}
 
 /**
  * scene -> feedback -> post. The feedback buffer is shared, so every scene
@@ -120,26 +128,24 @@ export class Pipeline {
     gl.bindTexture(gl.TEXTURE_2D, this.specTex)
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, SPECTRUM_SIZE, 1, gl.RED, gl.UNSIGNED_BYTE, frame.spectrum)
 
-    const scenePass = this.scenePasses[index]
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.sceneTarget.fbo)
     gl.viewport(0, 0, this.sceneTarget.width, this.sceneTarget.height)
-    gl.useProgram(scenePass.program)
-    uploadAudio(
-      scenePass.uniforms,
-      frame,
-      this.sceneTarget.width,
-      this.sceneTarget.height,
-      scene,
-      opts.hue,
-    )
-    scenePass.uniforms.tex('uWave', 2, this.waveTex)
-    scenePass.uniforms.tex('uSpectrum', 3, this.specTex)
-    gl.drawArrays(gl.TRIANGLES, 0, 3)
+
+    // Crossfade: draw the outgoing scene, then the incoming one over it with a
+    // constant alpha. Only costs a second scene pass while a fade is running.
+    if (opts.from && opts.blend < 1) {
+      this.drawScene(opts.from.index, frame, opts.from.scene, opts)
+      gl.enable(gl.BLEND)
+      gl.blendColor(0, 0, 0, opts.blend)
+      gl.blendFunc(gl.CONSTANT_ALPHA, gl.ONE_MINUS_CONSTANT_ALPHA)
+    }
+    this.drawScene(index, frame, scene, opts)
+    gl.disable(gl.BLEND)
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, next.fbo)
     gl.viewport(0, 0, this.width, this.height)
     gl.useProgram(this.feedback.program)
-    uploadAudio(this.feedback.uniforms, frame, this.width, this.height, scene, opts.hue)
+    uploadAudio(this.feedback.uniforms, frame, this.width, this.height, scene, opts.hue, opts.accent)
     this.feedback.uniforms.tex('uScene', 0, this.sceneTarget.tex)
     this.feedback.uniforms.tex('uPrev', 1, prev.tex)
     this.feedback.uniforms.f('uDecay', Math.min(0.985, scene.feedback.decay * opts.trailBias))
@@ -150,10 +156,27 @@ export class Pipeline {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.viewport(0, 0, this.width, this.height)
     gl.useProgram(this.post.program)
-    uploadAudio(this.post.uniforms, frame, this.width, this.height, scene, opts.hue)
+    uploadAudio(this.post.uniforms, frame, this.width, this.height, scene, opts.hue, opts.accent)
     this.post.uniforms.tex('uTex', 0, next.tex)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
 
     this.history = [next, prev]
+  }
+
+  private drawScene(index: number, frame: AudioFrame, scene: Scene, opts: RenderOptions) {
+    const pass = this.scenePasses[index]
+    this.gl.useProgram(pass.program)
+    uploadAudio(
+      pass.uniforms,
+      frame,
+      this.sceneTarget.width,
+      this.sceneTarget.height,
+      scene,
+      opts.hue,
+      opts.accent,
+    )
+    pass.uniforms.tex('uWave', 2, this.waveTex)
+    pass.uniforms.tex('uSpectrum', 3, this.specTex)
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, 3)
   }
 }
