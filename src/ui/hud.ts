@@ -4,7 +4,8 @@ import type { AudioFrame } from '../audio/frame'
 // Lowercase on purpose: these are plain keypresses, no shift.
 const keyList = (sceneCount: number) => [
   ['space', 'jump scene'],
-  [`1-${sceneCount}`, 'pick scene'],
+  [sceneCount > 10 ? '1-9 0' : `1-${sceneCount}`, 'pick scene'],
+  [', .', 'prev / next'],
   ['s', 'source'],
   ['f', 'fullscreen'],
   ['c', 're-roll camera'],

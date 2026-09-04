@@ -33,7 +33,7 @@ void main() {
 
   vec3 col = aberrated(uv, 0.002 + 0.022 * uNorm[BASS] + 0.030 * uDrop);
   col *= 1.0 + uKickFlash * punch;
-  col += bloom(uv, 0.020 + 0.020 * uNorm[AIR]) * (0.9 + 1.1 * uNorm[AIR]);
+  col += bloom(uv, 0.020 + 0.020 * uNorm[AIR]) * (0.9 + 1.1 * uNorm[AIR]) * uBloom;
 
   col *= smoothstep(1.25, 0.35, length(uv - 0.5) * 1.6);
   // Silence must look like silence, not like quiet music.

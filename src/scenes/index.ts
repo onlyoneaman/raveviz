@@ -2,6 +2,9 @@ import wave from './wave.glsl?raw'
 import radial from './radial.glsl?raw'
 import vortex from './vortex.glsl?raw'
 import mandala from './mandala.glsl?raw'
+import girder from './girder.glsl?raw'
+import moire from './moire.glsl?raw'
+import beams from './beams.glsl?raw'
 import kali from './kali.glsl?raw'
 import droste from './droste.glsl?raw'
 import metatron from './metatron.glsl?raw'
@@ -26,6 +29,10 @@ export type Scene = {
    * a rotating waveform is just a diagonal line.
    */
   camera?: boolean
+  /** Bloom multiplier. Techno wants hard edges; glow is a psy tell. Default 1. */
+  bloom?: number
+  /** Whether the borrowed third palette stop applies. Off keeps a scene monochrome. */
+  accent?: boolean
 }
 
 const hex = (v: string): Rgb => [
@@ -94,6 +101,36 @@ export const scenes: Scene[] = [
     palette: [hex('#4A00E0'), hex('#C6FF00')],
     resScale: 0.7,
     feedback: { decay: 0.78, scale: 1.002, rotate: 0.001 },
+  },
+  {
+    name: 'girder',
+    source: girder,
+    palette: [hex('#E8F0F5'), hex('#6E8FA6')],
+    resScale: 1.0,
+    feedback: { decay: 0.30, scale: 1.0, rotate: 0.0 },
+    camera: false,
+    bloom: 0.25,
+    accent: false,
+  },
+  {
+    name: 'moire',
+    source: moire,
+    palette: [hex('#FFFFFF'), hex('#AEBCC4')],
+    resScale: 1.0,
+    feedback: { decay: 0.20, scale: 1.0, rotate: 0.0 },
+    camera: false,
+    bloom: 0.1,
+    accent: false,
+  },
+  {
+    name: 'beams',
+    source: beams,
+    palette: [hex('#FFFFFF'), hex('#FF2A1A')],
+    resScale: 1.0,
+    feedback: { decay: 0.45, scale: 1.0, rotate: 0.0 },
+    camera: false,
+    bloom: 0.7,
+    accent: false,
   },
   {
     name: 'strobe',

@@ -37,7 +37,7 @@ type Pass = { program: WebGLProgram; uniforms: Uniforms }
  * a cleared buffer, which suits glow-heavy scenes far better than an alpha
  * crossfade, where the midpoint goes muddy instead of hot.
  */
-export type TransitionMode = 'fade' | 'burn' | 'flash'
+export type TransitionMode = 'fade' | 'burn' | 'flash' | 'cut'
 
 export type RenderOptions = {
   hue: number
@@ -52,6 +52,7 @@ export type RenderOptions = {
 /** Weights for the outgoing and incoming scene. Summing above 1 mid-fade is
  *  the point: the overlap blooms rather than dipping. */
 function mixWeights(mode: TransitionMode, b: number): [number, number] {
+  if (mode === 'cut') return b < 0.5 ? [1, 0] : [0, 1]
   const s = b * b * (3 - 2 * b)
   if (mode === 'fade') return [1 - s, s]
   const out = Math.sqrt(1 - b)

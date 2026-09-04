@@ -23,7 +23,7 @@ let fromIndex: number | null = null
 let blend = 1
 let blendS = camera.blendMinS
 let mode: TransitionMode = 'burn'
-const MODES: TransitionMode[] = ['fade', 'burn', 'burn', 'flash']
+const MODES: TransitionMode[] = ['fade', 'burn', 'burn', 'flash', 'cut']
 let autoCycle = show.autoCycle
 let hue = 0
 let trailBias = 1
@@ -44,8 +44,11 @@ function setScene(next: number) {
   if (target === sceneIndex) return
   fromIndex = sceneIndex
   blend = 0
-  blendS = camera.blendMinS + Math.random() * (camera.blendMaxS - camera.blendMinS)
   mode = MODES[Math.floor(Math.random() * MODES.length)]
+  blendS =
+    mode === 'cut'
+      ? 0.06
+      : camera.blendMinS + Math.random() * (camera.blendMaxS - camera.blendMinS)
   sceneIndex = target
   hue += 0.25
   rollCamera()
@@ -114,6 +117,9 @@ addEventListener('keydown', (event) => {
   const key = e.key.toLowerCase()
   if (key === ' ') { jumpScene(); e.preventDefault() }
   else if (key >= '1' && key <= '9') setScene(Number(key) - 1)
+  else if (key === '0') setScene(9)
+  else if (key === ',') setScene(sceneIndex - 1)
+  else if (key === '.') setScene(sceneIndex + 1)
   else if (key === 'c') rollCamera()
   else if (key === 'f') document.fullscreenElement ? document.exitFullscreen() : canvas.requestFullscreen()
   else if (key === 'h') hud.root.classList.toggle('hidden')

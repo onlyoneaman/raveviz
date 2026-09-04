@@ -23,7 +23,8 @@ connected it runs on a synthetic 145 BPM drive, so the screen is never dead.
 | key | |
 |---|---|
 | `space` | jump to a random scene |
-| `1`-`9` | pick scene (`1` is the raw waveform) |
+| `1`-`9` `0` | pick scene (`1` is the raw waveform) |
+| `,` `.` | previous / next scene |
 | `s` | cycle audio source |
 | `f` | fullscreen |
 | `p` | pause auto-cycle |
