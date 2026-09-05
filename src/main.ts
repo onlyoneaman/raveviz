@@ -5,7 +5,9 @@ import { ResolutionGovernor } from './gl/governor'
 import { Pipeline } from './gl/pipeline'
 import { scenes as initialScenes, type Scene } from './scenes'
 import { Director } from './show'
+import { detect } from './ui/capabilities'
 import { Hud } from './ui/hud'
+import { Welcome } from './ui/welcome'
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement
 const gl = createContext(canvas)
@@ -17,6 +19,12 @@ const governor = new ResolutionGovernor()
 const director = new Director(scenes)
 const hud = new Hud()
 document.body.appendChild(hud.root)
+
+const caps = detect()
+const welcome = new Welcome(caps, (kind) =>
+  pick(kind === 'system' ? SOURCES[0].open : SOURCES[1].open),
+)
+document.body.appendChild(welcome.root)
 
 let trailBias = 1
 let fps = 60
@@ -36,6 +44,7 @@ async function pick(open: () => Promise<Awaited<ReturnType<typeof openMic>>>) {
     return
   }
   hud.say('')
+  welcome.dismiss()
   await refreshSources()
 }
 

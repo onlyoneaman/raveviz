@@ -4,6 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>raveviz</title>
+    <meta name="description" content="Audio-reactive visuals in the browser. Twenty-three WebGL scenes locked to whatever you are playing." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cpath d='M2 16h4l3-9 4 18 4-13 3 7 3-4 3 1' stroke='%239fff00' stroke-width='2' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="raveviz" />
+    <meta property="og:description" content="Audio-reactive visuals in the browser. Twenty-three WebGL scenes locked to whatever you are playing." />
+    <meta property="og:image" content="/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
     <style>
       :root { color-scheme: dark; --ink: #d7e0e6; --dim: #6c7b85; --acid: #9fff00; }
       * { box-sizing: border-box; }
@@ -43,6 +51,36 @@
         background: #ff2d5510; border-left: 2px solid #ff2d55; color: #ffb3c4;
         line-height: 1.55; pointer-events: auto;
       }
+
+      .welcome {
+        position: fixed; inset: 0; z-index: 3; display: grid; place-items: center;
+        background: radial-gradient(ellipse at center, #000000cc, #000000f2);
+        transition: opacity .35s ease;
+      }
+      .welcome.gone { opacity: 0; pointer-events: none; }
+      .panel {
+        max-width: 520px; padding: 30px 32px; text-align: left;
+        background: #0a0d0fdd; border: 1px solid #ffffff14; border-radius: 3px;
+      }
+      .panel h1 {
+        margin: 0; font-size: 13px; letter-spacing: .3em; text-transform: uppercase;
+        color: var(--acid); font-weight: 600;
+      }
+      .lede { margin: 10px 0 18px; color: var(--ink); font-size: 14px; line-height: 1.5; }
+      .warn {
+        margin: 0 0 18px; padding: 9px 11px; font-size: 12px; line-height: 1.55;
+        background: #ff2d5510; border-left: 2px solid #ff2d55; color: #ffb3c4;
+      }
+      .picks { display: flex; gap: 8px; flex-wrap: wrap; }
+      .picks button {
+        font: inherit; font-size: 13px; padding: 9px 15px; border: 0; cursor: pointer;
+        border-radius: 2px; background: #ffffff14; color: var(--ink);
+      }
+      .picks button:hover { background: #ffffff26; }
+      .picks button.primary { background: var(--acid); color: #000; font-weight: 600; }
+      .how { margin: 18px 0 0; padding-left: 18px; color: var(--dim); font-size: 12px; line-height: 1.75; }
+      .how b { color: var(--ink); font-weight: 500; }
+      .foot { margin: 14px 0 0; color: #4d5a63; font-size: 12px; line-height: 1.6; }
 
       .keys { display: flex; flex-wrap: wrap; gap: 12px; color: #4d5a63; }
       .keys b { color: var(--dim); font-weight: 500; margin-right: 5px; }
