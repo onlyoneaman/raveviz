@@ -124,6 +124,8 @@ export const show = {
   // an age. Drawn fresh each time so the set does not feel scheduled.
   beatsPerSceneMin: 12,
   beatsPerSceneMax: 40,
+  // Changes stay inside one genre for a while, so the set has a through-line.
+  scenesPerGenre: 5,
   autoCycle: true,
   hudIdleMs: 3000,
 }

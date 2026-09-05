@@ -53,8 +53,14 @@ and `specAt(x)` for a log-spaced spectrum magnitude, both taking x in 0..1.
 That is how the circular scenes bend frequency around a ring.
 
 **Adding a scene:** drop a `.glsl` next to the others and add one entry to
-`src/scenes/index.ts` with its palette, resolution scale and feedback settings.
-No other file changes.
+`src/scenes/index.ts` with its `genre`, `energy` (1 calm to 5 relentless),
+palette, resolution scale and feedback settings. No other file changes.
+
+**What plays next:** `src/show.ts`. Scenes are grouped by genre and rated for
+energy; a change stays inside the current genre for a few scenes and prefers
+scenes whose energy matches what the audio is doing. `mirror: false` opts a
+scene out of the random symmetry folds, which is right for anything with an
+inherent orientation (a face, a horizon, a corridor, a readout).
 
 **Colors and trails:** the `palette` and `feedback` fields in that same
 registry. `decay` is how long trails last, `scale` and `rotate` are the

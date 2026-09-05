@@ -28,6 +28,7 @@ uniform float uKickZoom;
 uniform float uKickFlash;
 uniform float uBloom;
 uniform float uFill;
+uniform float uMirror;
 
 /** Time-domain sample at x in 0..1, returned in -1..1. */
 float waveAt(float x) { return texture(uWave, vec2(clamp(x, 0.0, 1.0), 0.5)).r * 2.0 - 1.0; }
@@ -72,6 +73,15 @@ vec3 pal(float t) {
     ? mix(uPalA, uPalB, smoothstep(0.0, 1.0, t * 2.0))
     : mix(uPalB, uPalC, smoothstep(0.0, 1.0, t * 2.0 - 1.0));
   return hueRotate(c, uHue);
+}
+
+/** Random symmetry fold, re-rolled per scene. */
+vec2 mirrorFold(vec2 uv, float mode) {
+  if (mode < 0.5) return uv;
+  if (mode < 1.5) return vec2(abs(uv.x), uv.y);
+  if (mode < 2.5) return vec2(uv.x, abs(uv.y));
+  if (mode < 3.5) return abs(uv);
+  return kale(uv, mode < 4.5 ? 4.0 : 8.0);
 }
 
 /**

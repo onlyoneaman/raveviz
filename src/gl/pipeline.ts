@@ -25,7 +25,8 @@ const SCENE_MAIN = `
 void main() {
   vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;
   uv = rot2(uCamSpin) * uv * uCamZoom;
-  fragColor = vec4(scene(uv) + ambient(uv) * uFill, 1.0);
+  vec2 folded = mirrorFold(uv, uMirror);
+  fragColor = vec4(scene(folded) + ambient(uv) * uFill, 1.0);
 }`
 
 const frag = (body: string, sceneMain: boolean) =>
@@ -44,6 +45,7 @@ export type RenderOptions = {
   hue: number
   trailBias: number
   accent: readonly [number, number, number]
+  mirror: number
   /** Scene being faded out, and how far the fade has got. 1 means done. */
   from: { scene: Scene; index: number } | null
   blend: number
@@ -205,6 +207,7 @@ export class Pipeline {
       opts.hue,
       opts.accent,
     )
+    pass.uniforms.f('uMirror', opts.mirror)
     pass.uniforms.tex('uWave', 2, this.waveTex)
     pass.uniforms.tex('uSpectrum', 3, this.specTex)
     pass.uniforms.tex('uOm', 4, this.omTex)
