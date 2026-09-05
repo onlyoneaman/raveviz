@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "shots": "python3 scripts/shots.py"
+    "shots": "python3 scripts/shots.py",
+    "deploy": "vite build && wrangler pages deploy dist --project-name raveviz --branch main --commit-dirty=true"
   },
   "devDependencies": {
     "@types/bun": "^1.4.1",

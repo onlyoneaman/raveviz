@@ -1,5 +1,7 @@
 # raveviz
 
+Live at **https://viz.amankumar.ai**
+
 Live psytech audio-reactive visualizer. Listens to the mic or to whatever the
 laptop is playing, and renders WebGL2 scenes locked to the beat.
 
@@ -90,6 +92,15 @@ src/gl/       scene -> feedback -> post, plus the resolution governor
 src/scenes/   one .glsl per scene, plus the registry
 src/shaders/  shared lib, uniform block, feedback and post passes
 ```
+
+## Deploy
+
+```bash
+bun run deploy     # vite build + wrangler pages deploy
+```
+
+Cloudflare Pages project `raveviz`, custom domain `viz.amankumar.ai` (proxied
+CNAME to `raveviz.pages.dev`). Needs `CLOUDFLARE_API_TOKEN` in the environment.
 
 ## Tests
 
