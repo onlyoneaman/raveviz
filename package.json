@@ -10,11 +10,18 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "shots": "python3 scripts/shots.py",
-    "deploy": "vite build && wrangler pages deploy dist --project-name raveviz --branch main --commit-dirty=true"
+    "deploy": "vite build && wrangler pages deploy dist --project-name raveviz --branch main --commit-dirty=true",
+    "push": "cd .. && git subtree split --prefix=raveviz -b raveviz-export && git push git@github.com:onlyoneaman/raveviz.git raveviz-export:main && git branch -D raveviz-export"
   },
   "devDependencies": {
     "@types/bun": "^1.4.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onlyoneaman/raveviz.git"
+  },
+  "homepage": "https://viz.amankumar.ai",
+  "license": "MIT"
 }
