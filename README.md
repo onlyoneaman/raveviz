@@ -102,11 +102,8 @@ bun run deploy     # vite build + wrangler pages deploy
 Cloudflare Pages project `raveviz`, custom domain `viz.amankumar.ai` (proxied
 CNAME to `raveviz.pages.dev`). Needs `CLOUDFLARE_API_TOKEN` in the environment.
 
-The source of truth is the `raveviz/` directory of a private scratch repo;
-`bun run push` splits it out and pushes to
-[onlyoneaman/raveviz](https://github.com/onlyoneaman/raveviz).
-
-If you connect that repo to Cloudflare Pages instead, the build settings are:
+If you connect this repo to Cloudflare Pages instead of deploying directly, the
+build settings are:
 
 | | |
 |---|---|
